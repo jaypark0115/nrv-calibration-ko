@@ -427,7 +427,7 @@ p {
 }
 
 .lead {
-  max-width: 920px;
+  max-width: none;
   margin-bottom: 1.65rem;
   color: #4b5563;
   font-size: 1.09rem;
@@ -1759,6 +1759,9 @@ p {
   margin: 0 0 16px;
   font-size: 1.35rem;
   line-height: 1.35;
+}
+.sitemap-card h2::before {
+  display: none;
 }
 .sitemap-card p {
   margin: 0;
