@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="NRV DVS 캘리브레이션 문서 샌드박스 한국어판."
+    />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>NRV DVS 캘리브레이션 가이드 — 캘리브레이션 설명</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="mobile-header">
+      <button
+        class="menu-button"
+        type="button"
+        aria-label="문서 내비게이션 열기"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+      <a href="https://nrvcorp.github.io/docs/">캘리브레이션 설명</a>
+    </header>
+
+    <div class="site-shell">
+      <aside class="sidebar" id="sidebar" aria-label="문서 내비게이션">
+        <div class="brand">
+          <a href="https://nrvcorp.github.io/docs/" aria-label="캘리브레이션 설명 홈">
+            <img src="assets/logo.png" alt="NRV" />
+            <span>캘리브레이션 설명</span>
+          </a>
+          <label class="search-box">
+            <span class="sr-only">현재 페이지 검색</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m20 20-4.35-4.35m2.35-5.4A7.75 7.75 0 1 1 2.5 10.25a7.75 7.75 0 0 1 15.5 0Z"
+              />
+            </svg>
+            <input
+              id="section-search"
+              type="search"
+              placeholder="현재 페이지 검색"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+
+        <nav class="primary-nav">
+          <p class="nav-caption">소개</p>
+          <a class="nav-muted" href="#">NRV 소개</a>
+          <a class="nav-muted" href="#">문서 안내</a>
+
+          <p class="nav-caption">제품</p>
+          <a class="nav-muted" href="#">NRV DVS</a>
+          <a class="nav-muted" href="#">개발 키트</a>
+
+          <p class="nav-caption">소프트웨어</p>
+          <a class="nav-muted" href="#">시작하기</a>
+          <a class="nav-muted" href="#">API 및 코드 예제</a>
+
+          <p class="nav-caption">데이터</p>
+          <a class="nav-muted" href="#">데이터셋</a>
+          <a class="active" href="#top" aria-current="page">캘리브레이션</a>
+
+          <div class="section-nav chapter-nav" aria-label="캘리브레이션 챕터">
+            <a class="active-chapter" href="#what-is-camera-calibration">1. 카메라 캘리브레이션이란?</a>
+            <a class="chapter-two-link" href="02-dvs-calibration-method.html">2. NRV DVS 캘리브레이션 방법</a>
+            <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+            <span>4. 전체 캘리브레이션 워크플로우</span>
+            <span>5. 자동 캘리브레이션 프로그램</span>
+            <span>6. 캘리브레이션 결과와 적용</span>
+          </div>
+        </nav>
+
+        <p class="sidebar-note">로컬 캘리브레이션 샌드박스</p>
+      </aside>
+
+      <button class="nav-backdrop" type="button" aria-label="내비게이션 닫기"></button>
+
+      <main class="content-wrap" id="top">
+        <article class="content">
+          <div class="document-kicker">
+            <span>캘리브레이션 가이드</span>
+            <div class="kicker-actions">
+              <span class="draft-label">공개 설명 페이지</span>
+              
+            </div>
+          </div>
+
+          <nav class="chapter-switcher" aria-label="캘리브레이션 챕터 이동">
+            <span class="chapter-switcher-label">캘리브레이션 글 목록</span>
+            <div>
+              <a class="current" href="01-camera-calibration.html" aria-current="page">1. 카메라 캘리브레이션이란?</a>
+              <a href="02-dvs-calibration-method.html">2. NRV DVS 캘리브레이션 방법</a>
+              <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+            </div>
+          </nav>
+
+          <h1 id="what-is-camera-calibration">
+            1. 카메라 캘리브레이션이란?
+          </h1>
+
+          
+          <div class="source-note" role="note">
+            <strong>작성 안내</strong>
+            <span>이 글은 NRV의 지원을 받아 작성한 한국어 설명 페이지입니다. 공식 NRV docs 홈페이지에는 영어 버전이 있습니다.</span>
+          </div>
+<p class="lead">
+            카메라 캘리브레이션은 카메라의 영상 좌표와 실제 장면의 기하 구조를
+            연결하는 파라미터를 계산하는 과정입니다. 이 섹션에서는
+            캘리브레이션이 필요한 이유, 실제로 추정되는 파라미터, 그리고
+            모노·스테레오 NRV DVS에서 결과가 사용되는 방식을 설명합니다.
+          </p>
+
+          <div class="scope-note" role="note">
+            <strong>이 섹션의 범위</strong>
+            <span>
+              캘리브레이션이 필요한 이유, 계산되는 카메라 특성, 그리고 모노·
+              스테레오 NRV DVS 시스템에서 파라미터가 사용되는 방식을
+              설명합니다.
+            </span>
+          </div>
+
+          <section
+            class="section-intro searchable-section"
+            data-search-title="카메라 캘리브레이션이란?"
+          >
+            <p>
+              카메라는 3차원 장면에서 들어온 빛을 2차원 영상 좌표로 변환합니다.
+              하지만 실제 변환은 이상적이지 않습니다. 렌즈는 빛을 굴절시키고,
+              센서는 고유한 크기와 픽셀 배열을 가지며, 광학 중심이 영상의 정확한
+              중앙과 일치하지 않을 수도 있습니다. 캘리브레이션은 이러한
+              카메라별 특성을 계산하여 영상 좌표를 더 정확하게 해석할 수 있게
+              합니다.
+            </p>
+            <p>
+              따라서 캘리브레이션은 단순히 영상을 보기 좋게 만드는 과정이
+              아니라, 정확한 측정을 위한 기초 과정입니다. 카메라 모델을 알면
+              예측 가능한 기하학적 오차를 보정하고 하나 이상의 카메라에서 얻은
+              관측값을 일관된 좌표계에서 사용할 수 있습니다.
+            </p>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="basic-concept"
+            data-search-title="카메라 캘리브레이션의 기본 개념"
+          >
+            <h3>1.1 카메라 캘리브레이션의 기본 개념</h3>
+            <p>
+              모든 카메라는 서로 다른 렌즈와 센서 특성을 가집니다. 같은 모델의
+              카메라라도 제조 공차, 렌즈 장착 상태, 센서 정렬 상태 때문에 작은
+              차이가 발생할 수 있습니다. 따라서 카메라가 촬영한 좌표는 실제
+              장면을 완벽하게 동일한 비율로 표현하지 않습니다.
+            </p>
+            <p>
+              카메라 캘리브레이션은 각 카메라가 영상을 형성하는 방식을 설명하는
+              파라미터를 계산합니다. 일반적으로 기하 구조를 알고 있는 패턴을
+              여러 위치와 각도에서 관측하고, 패턴의 실제 구조와 영상에서 측정된
+              좌표를 비교합니다. 계산된 파라미터는 이상적인 영상 좌표와 실제
+              카메라 좌표 사이의 변환에 사용됩니다.
+            </p>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="why-needed"
+            data-search-title="카메라 캘리브레이션이 필요한 이유"
+          >
+            <h3>1.2 카메라 캘리브레이션이 필요한 이유</h3>
+            <p>
+              렌즈 왜곡은 캘리브레이션이 필요한 가장 눈에 띄는 이유입니다. 실제
+              장면의 직선이 영상 가장자리에서 휘어 보일 수 있으며, 같은 물체도
+              영상 안의 위치에 따라 조금씩 다른 형태와 위치로 관측될 수
+              있습니다. 이는 무작위 노이즈가 아니라 반복적으로 발생하는 좌표
+              오차입니다.
+            </p>
+            <p>
+              이러한 위치별 왜곡은 물체의 겉보기 형상도 변화시킵니다. 동일한
+              물체라도 영상 중앙에서는 원래 형태와 가깝게 보이지만, 가장자리에서는
+              늘어나거나 눌리거나 휘어진 형태로 보일 수 있습니다. 따라서 물체
+              탐지기는 영상 위치에 따라 같은 물체에 서로 다르게 반응할 수 있으며,
+              탐지의 일관성과 정확도가 저하될 수 있습니다.
+            </p>
+            <p>
+              이 오차를 보정하지 않으면 물체 중심 위치, 위치 추정, 스테레오
+              매칭과 깊이 계산에도 오차가 전달됩니다. 따라서 정확한 물체 검출,
+              치수 측정, 위치 추정 또는 깊이 계산이 필요한 시스템에서는
+              캘리브레이션이 필수입니다.
+            </p>
+
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">왜곡 보정 전후 비교</div>
+              <img
+                src="assets/lens-distortion-before-after.png"
+                alt="원형 그리드 이벤트 영상을 렌즈 왜곡 보정 전후로 비교한 모습"
+              />
+              <figcaption>
+                렌즈 왜곡은 영상 가장자리의 직선 구조를 휘게 만들 수 있습니다.
+                캘리브레이션 파라미터를 사용하면 이 왜곡을 보정할 수 있습니다.
+              </figcaption>
+            </figure>
+
+            <div class="concept-callout">
+              <span>스테레오 캘리브레이션</span>
+              <h4>좌우 영상의 대응점은 같은 에피폴라 선 위에 있어야 합니다</h4>
+              <p>
+                두 카메라를 가로로 나란히 설치하더라도 영상이 자동으로 완벽하게
+                정렬되지는 않습니다. 두 카메라의 내부 특성 차이와 설치 높이,
+                pitch 또는 roll의 작은 오차 때문에 같은 장면의 점이 왼쪽과
+                오른쪽 영상에서 서로 다른 세로 위치, 즉 다른 y 좌표에 나타날
+                수 있습니다.
+              </p>
+              <p>
+                스테레오 캘리브레이션은 두 카메라 사이의 위치와 방향 관계를
+                계산합니다. 이후 에피폴라 정렬을 적용하면 같은 물체의 대응점이
+                좌우 영상의 같은 수평 에피폴라 선에 놓이도록 맞출 수 있습니다. 그러면
+                스테레오 매칭을 주로 가로 방향에서 수행할 수 있어 시차와 깊이
+                계산이 더 정확해집니다.
+              </p>
+            </div>
+
+            <figure class="doc-figure wide-figure supporting-example">
+              <div class="figure-label">
+                스테레오 정렬 보정 전후의 에피폴라 정렬
+              </div>
+              <img
+                src="assets/stereo-original-calibrated.png"
+                alt="수평 기준선으로 비교한 스테레오 이벤트 영상의 보정 전후"
+              />
+              <figcaption>
+                정렬 보정 전에는 같은 구조가 좌우 영상의 서로 다른 에피폴라 선에
+                나타날 수 있습니다. 에피폴라 정렬 후에는 대응하는 구조가 같은
+                수평 에피폴라 선에 정렬됩니다.
+              </figcaption>
+            </figure>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="intrinsic-parameters"
+            data-search-title="모노와 스테레오 캘리브레이션에서 추정되는 파라미터"
+          >
+            <h3>1.3 모노와 스테레오 캘리브레이션에서 추정되는 파라미터</h3>
+            <p>
+              캘리브레이션은 보정된 영상을 바로 만드는 과정만을 의미하지
+              않습니다. 먼저 카메라 시스템을 설명하는 수치 파라미터를 추정하고,
+              그 값을 저장한 뒤 실제 보정 과정에 사용합니다. 필요한 결과값은
+              카메라가 한 대인지, 스테레오로 두 대인지에 따라 달라집니다.
+            </p>
+
+            <div class="calibration-types">
+              <section class="calibration-type">
+                <div class="type-heading">
+                  <span>모노 캘리브레이션</span>
+                  <strong>카메라 한 대</strong>
+                </div>
+                <p class="type-summary">
+                  한 카메라가 빛을 영상 또는 이벤트 좌표로 변환하는 방식을
+                  추정합니다.
+                </p>
+                <dl class="parameter-groups">
+                  <div>
+                    <dt>카메라 행렬 <code>K</code></dt>
+                    <dd>
+                      초점 거리 <code>f<sub>x</sub>, f<sub>y</sub></code>와
+                      주점 <code>c<sub>x</sub>, c<sub>y</sub></code>입니다.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>왜곡 벡터 <code>D</code></dt>
+                    <dd>
+                      방사 왜곡 계수
+                      <code>k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub>…</code>와
+                      접선 왜곡 계수
+                      <code>p<sub>1</sub>, p<sub>2</sub></code>입니다.
+                    </dd>
+                  </div>
+                </dl>
+                <p class="type-use">
+                  <strong>사용 목적</strong>
+                  한 영상의 왜곡을 제거하거나 개별 픽셀·이벤트 좌표를
+                  보정합니다.
+                </p>
+              </section>
+
+              <section class="calibration-type stereo-type">
+                <div class="type-heading">
+                  <span>스테레오 캘리브레이션</span>
+                  <strong>카메라 두 대</strong>
+                </div>
+                <p class="includes-note">
+                  왼쪽과 오른쪽 카메라 각각의 모노 캘리브레이션 결과를 모두
+                  포함합니다.
+                </p>
+                <dl class="parameter-groups">
+                  <div>
+                    <dt>좌우 카메라 모델</dt>
+                    <dd>
+                      <code>K<sub>L</sub>, D<sub>L</sub></code> 및
+                      <code>K<sub>R</sub>, D<sub>R</sub></code>입니다.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>상대 자세 <code>R, T</code></dt>
+                    <dd>
+                      한 카메라 좌표계를 기준으로 다른 카메라의 회전과 이동을
+                      나타냅니다.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>베이스라인 <code>‖T‖</code></dt>
+                    <dd>
+                      두 카메라 중심 사이의 실제 거리입니다. 캘리브레이션 패턴
+                      치수와 동일한 단위로 계산됩니다.
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>스테레오 기하 정보</dt>
+                    <dd>
+                      Essential matrix <code>E</code>, fundamental matrix
+                      <code>F</code> 및 정렬 변환입니다.
+                    </dd>
+                  </div>
+                </dl>
+                <p class="type-use">
+                  <strong>사용 목적</strong>
+                  에피폴라 정렬, 스테레오 매칭, 시차 및 깊이 계산에
+                  사용합니다.
+                </p>
+              </section>
+            </div>
+
+            <p class="model-note">
+              왜곡 계수의 정확한 개수는 사용하는 카메라 모델에 따라 달라집니다.
+              스테레오 캘리브레이션은 각 카메라의 개별 캘리브레이션을 대체하는
+              것이 아니라, 그 결과에 두 카메라 사이의 관계를 추가하는
+              과정입니다.
+            </p>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="removing-distortion"
+            data-search-title="캘리브레이션 파라미터 적용: 왜곡 보정과 정렬"
+          >
+            <h3>1.4 캘리브레이션 파라미터 적용: 왜곡 보정과 정렬</h3>
+            <p>
+              캘리브레이션과 정렬(rectification)은 순서상 이어지는 작업이지만
+              역할은 다릅니다. 먼저 캘리브레이션은 체커보드처럼 기준이 되는
+              데이터를 사용해 카메라 파라미터를 계산합니다. 이 단계에서 바로
+              보정된 영상이 만들어지는 것은 아니며, 이후 실제 입력 데이터를
+              고칠 때 사용할 기준값을 얻는 과정입니다.
+            </p>
+            <div class="concept-callout calibration-rectify-note" role="note">
+              <span>캘리브레이션 vs. 정렬</span>
+              <h4>캘리브레이션은 값을 구하는 단계이고, 정렬은 그 값을 적용하는 단계입니다.</h4>
+              <dl class="step-definitions">
+                <div>
+                  <dt>캘리브레이션</dt>
+                  <dd>
+                    카메라 행렬, 왜곡 계수, 그리고 스테레오 시스템에서는 두 카메라
+                    사이의 상대 자세를 추정합니다. 보통 오프라인에서 한 번 수행하고,
+                    렌즈, 초점, 센서, 카메라 장착 상태가 바뀌었을 때 다시 수행합니다.
+                    직접적인 결과물은 보정 영상이 아니라 파라미터입니다.
+                  </dd>
+                </div>
+                <div>
+                  <dt>왜곡 보정 / 정렬</dt>
+                  <dd>
+                    계산된 파라미터를 실제 영상, 측정 좌표 또는 이벤트 좌표에
+                    적용하는 단계입니다. 모노 카메라에서는 주로 렌즈 때문에 휘어진
+                    좌표를 바로잡고, 스테레오 카메라에서는 좌우 영상의 대응점이
+                    같은 수평 에피폴라 선에 오도록 두 영상을 맞춥니다.
+                  </dd>
+                </div>
+              </dl>
+              <p>
+                온라인 인식 시스템에서는 캘리브레이션 자체를 매 프레임마다 실행할
+                필요는 없습니다. 반복적으로 들어오는 입력 데이터에 계속 적용되는
+                것은 왜곡 보정 또는 정렬 맵이며, 이 적용 단계가 실시간 처리가
+                필요한 부분입니다.
+              </p>
+            </div>
+            <p>
+              왜곡 보정 또는 정렬은 이렇게 얻은 파라미터를 실제 데이터에 적용하는
+              단계입니다. 모노 영상에서는 휘어 보이는 직선이나 가장자리 좌표를
+              원래의 기하 구조에 더 가깝게 다시 배치합니다. 스테레오 영상에서는
+              왼쪽 영상과 오른쪽 영상의 같은 물체가 같은 높이의 선 위에 놓이도록
+              맞춰, 이후 스테레오 매칭과 깊이 계산이 쉬워지도록 만듭니다.
+            </p>
+            <p>
+              이 과정을 거치면 물체 검출, 위치 추정, 스테레오 매칭 같은 후속
+              알고리즘이 더 안정적인 좌표를 사용할 수 있습니다. 다만 보정은 새
+              정보를 만들어내는 작업은 아닙니다. 출력 영역을 어떻게 설정하느냐에
+              따라 영상 가장자리가 조금 잘리거나, 반대로 원본 픽셀이 없는 빈
+              영역이 생길 수 있습니다.
+            </p>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="camera-types"
+            data-search-title="모노·스테레오 NRV DVS 캘리브레이션"
+          >
+            <h3>1.5 모노·스테레오 NRV DVS 캘리브레이션</h3>
+            <p>
+              NRV DVS는 모노 또는 스테레오 구성으로 사용됩니다. 여기서 NRV DVS는
+              센싱 장치를 가리키고, 모노와 스테레오는 카메라 구성을 의미합니다.
+              따라서 NRV DVS 캘리브레이션이 모노·스테레오와 별개의 세 번째 방식으로
+              존재하는 것이 아닙니다. NRV DVS 한 대를 사용하면 모노 캘리브레이션을
+              수행하고, NRV DVS 두 대를 함께 사용하면 스테레오 캘리브레이션을
+              수행합니다.
+            </p>
+            <p>
+              모노 NRV DVS 시스템에서는 하나의 렌즈와 센서에서 발생한 이벤트
+              좌표를 보정하기 위한 카메라 모델을 추정합니다. 스테레오 NRV DVS
+              시스템에서는 왼쪽과 오른쪽 NRV DVS를 각각 캘리브레이션한
+              뒤, 두 카메라 사이의 상대 자세와 베이스라인을 추가로 추정합니다.
+              이 스테레오 파라미터는 좌우 카메라에서 관측된 같은 구조가 같은
+              수평 에피폴라 선에 놓이도록 정렬하는 데 사용되며, 이후 스테레오
+              매칭과 깊이 계산의 기준이 됩니다.
+            </p>
+            <p>
+              같은 모노·스테레오 구분은 CIS 카메라에도 적용됩니다. 다음
+              섹션에서는 그중 NRV DVS에서 캘리브레이션 데이터를 어떻게 만들고,
+              모노·스테레오 캘리브레이션을 어떻게 수행하는지에 초점을 맞춥니다.
+            </p>
+
+            <p class="bottom-author">by jy</p>
+
+            <nav
+              class="chapter-switcher chapter-switcher-bottom"
+              aria-label="캘리브레이션 챕터 이동"
+            >
+              <span class="chapter-switcher-label">캘리브레이션 글 목록</span>
+              <div>
+                <a class="current" href="01-camera-calibration.html" aria-current="page">1. 카메라 캘리브레이션이란?</a>
+                <a href="02-dvs-calibration-method.html">2. NRV DVS 캘리브레이션 방법</a>
+                <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+              </div>
+            </nav>
+
+            <nav class="article-pager" aria-label="이전 글과 다음 글">
+              <span class="pager-link pager-disabled">이전 글 없음</span>
+              <a class="pager-link pager-next" href="02-dvs-calibration-method.html">
+                다음 글: 2. NRV DVS 캘리브레이션 방법
+              </a>
+            </nav>
+          </section>
+
+          <p class="search-empty" role="status" hidden>
+            검색어와 일치하는 하위 섹션이 없습니다.
+          </p>
+
+          <footer class="page-footer">
+            <span>캘리브레이션 설명</span>
+            <a href="#top">맨 위로 ↑</a>
+          </footer>
+          <p class="repository-note">NRV의 지원을 받아 작성했으며, 공식 docs 홈페이지에는 영어 버전이 있습니다.</p>
+        </article>
+
+        <aside class="page-toc" aria-label="현재 페이지 목차">
+          <strong>현재 페이지</strong>
+          <a href="#basic-concept">1.1 기본 개념</a>
+          <a href="#why-needed">1.2 캘리브레이션이 필요한 이유</a>
+          <a href="#intrinsic-parameters">1.3 모노·스테레오 결과</a>
+          <a href="#removing-distortion">1.4 파라미터 적용</a>
+          <a href="#camera-types">1.5 NRV DVS 구성</a>
+        </aside>
+      </main>
+    </div>
+  </body>
+</html>

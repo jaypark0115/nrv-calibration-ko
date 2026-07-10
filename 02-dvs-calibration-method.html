@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="NRV DVS 캘리브레이션 방법 문서."
+    />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>NRV DVS 캘리브레이션 방법 — 캘리브레이션 설명</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header class="mobile-header">
+      <button
+        class="menu-button"
+        type="button"
+        aria-label="문서 내비게이션 열기"
+        aria-controls="sidebar"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+      <a href="https://nrvcorp.github.io/docs/">캘리브레이션 설명</a>
+    </header>
+
+    <div class="site-shell">
+      <aside class="sidebar" id="sidebar" aria-label="문서 내비게이션">
+        <div class="brand">
+          <a href="https://nrvcorp.github.io/docs/" aria-label="캘리브레이션 설명 홈">
+            <img src="assets/logo.png" alt="NRV" />
+            <span>캘리브레이션 설명</span>
+          </a>
+          <label class="search-box">
+            <span class="sr-only">이 페이지 검색</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m20 20-4.35-4.35m2.35-5.4A7.75 7.75 0 1 1 2.5 10.25a7.75 7.75 0 0 1 15.5 0Z"
+              />
+            </svg>
+            <input
+              id="section-search"
+              type="search"
+              placeholder="이 페이지 검색"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+
+        <nav class="primary-nav">
+          <p class="nav-caption">소개</p>
+          <a class="nav-muted" href="#">NRV 소개</a>
+          <a class="nav-muted" href="#">문서</a>
+
+          <p class="nav-caption">제품</p>
+          <a class="nav-muted" href="#">NRV DVS</a>
+          <a class="nav-muted" href="#">개발 키트</a>
+
+          <p class="nav-caption">소프트웨어</p>
+          <a class="nav-muted" href="#">시작하기</a>
+          <a class="nav-muted" href="#">API 및 코드 예제</a>
+
+          <p class="nav-caption">데이터</p>
+          <a class="nav-muted" href="#">데이터셋</a>
+          <a class="active" href="01-camera-calibration.html">캘리브레이션</a>
+
+          <div class="section-nav chapter-nav" aria-label="캘리브레이션 챕터">
+            <a href="01-camera-calibration.html">1. 카메라 캘리브레이션이란?</a>
+            <a class="chapter-two-link active-chapter" href="02-dvs-calibration-method.html">2. NRV DVS 캘리브레이션 방법</a>
+            <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+            <span>4. 전체 캘리브레이션 워크플로우</span>
+            <span>5. 자동 캘리브레이션 프로그램</span>
+            <span>6. 캘리브레이션 결과와 적용</span>
+          </div>
+        </nav>
+
+        <p class="sidebar-note">로컬 캘리브레이션 샌드박스</p>
+      </aside>
+
+      <button class="nav-backdrop" type="button" aria-label="내비게이션 닫기"></button>
+
+      <main class="content-wrap" id="top">
+        <article class="content">
+          <div class="document-kicker">
+            <span>캘리브레이션 가이드</span>
+            <div class="kicker-actions">
+              <span class="draft-label">공개 설명 페이지</span>
+              
+            </div>
+          </div>
+
+          <nav class="chapter-switcher" aria-label="캘리브레이션 챕터 이동">
+            <span class="chapter-switcher-label">캘리브레이션 글 목록</span>
+            <div>
+              <a href="01-camera-calibration.html">1. 카메라 캘리브레이션이란?</a>
+              <a class="current" href="02-dvs-calibration-method.html" aria-current="page">2. NRV DVS 캘리브레이션 방법</a>
+              <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+            </div>
+          </nav>
+
+          <h1 id="nrv-dvs-calibration-method">
+            2. NRV DVS 캘리브레이션 방법
+          </h1>
+
+          
+          <div class="source-note" role="note">
+            <strong>작성 안내</strong>
+            <span>이 글은 NRV의 지원을 받아 작성한 한국어 설명 페이지입니다. 공식 NRV docs 홈페이지에는 영어 버전이 있습니다.</span>
+          </div>
+<p class="lead">
+            NRV DVS 캘리브레이션의 기하학적 목적은 일반 카메라
+            캘리브레이션과 같습니다. 영상 또는 이벤트 좌표를 측정에 사용할 수
+            있도록 카메라 파라미터를 추정하는 것입니다. 차이는 캘리브레이션
+            포인트를 센서가 어떻게 볼 수 있게 만드느냐에 있습니다. NRV DVS는 밝기
+            프레임 전체를 계속 출력하지 않으므로, 캘리브레이션 패턴이 시간에 따라
+            밝기 변화를 만들어야 합니다.
+          </p>
+
+          <div class="scope-note" role="note">
+            <strong>이 섹션의 범위</strong>
+            <span>
+              NRV DVS 캘리브레이션에 밝기 변화가 필요한 이유, blinking
+              asymmetric circle grid를 사용하는 이유와 패턴을 개념적으로 어떻게
+              구성하는지 설명합니다.
+            </span>
+          </div>
+
+          <section
+            class="doc-section searchable-section"
+            id="difference-from-conventional-cameras"
+            data-search-title="CIS 카메라와의 차이"
+          >
+            <h3>2.1 CIS 카메라와의 차이</h3>
+            <p>
+              CIS 카메라는 매 프레임마다 전체 밝기 영상을 촬영합니다.
+              따라서 정지된 checkerboard나 circle grid도 영상의 밝기 패턴에서
+              직접 검출할 수 있습니다.
+            </p>
+            <p>
+              NRV DVS는 다르게 동작합니다. 전체 밝기 프레임을 계속 보내는
+              대신, 각 픽셀의 밝기가 변할 때만 event를 출력합니다. 그래서 CIS
+              카메라에는 선명하게 보이는 정지된 캘리브레이션 보드도 NRV DVS에는
+              충분한 데이터를 만들지 못할 수 있습니다.
+            </p>
+            <p>
+              NRV DVS 캘리브레이션에서는 캘리브레이션 포인트가 시간에 따라
+              변해야 합니다. 그래야 NRV DVS가 알고 있는 패턴 위치에서 event를 생성할
+              수 있습니다.
+            </p>
+
+            <figure class="doc-figure comparison-figure">
+              <div class="figure-label">CIS 카메라 vs. NRV DVS</div>
+              <div class="figure-grid two-up">
+                <div>
+                  <img
+                    src="assets/frame-camera-full-brightness-pattern.jpg"
+                    alt="CIS 카메라로 촬영한 전체 비대칭 원 그리드 모니터 패턴"
+                  />
+                  <span>CIS 카메라: 전체 밝기 패턴</span>
+                </div>
+                <div>
+                  <img
+                    src="assets/github-dvs-5.png"
+                    alt="밝기 변화로 생성된 NRV DVS의 원 그리드 관측"
+                  />
+                  <span>NRV DVS: 변화 지점의 event</span>
+                </div>
+              </div>
+              <figcaption>
+                일반 카메라와 달리 NRV DVS는 캘리브레이션 데이터를 만들기
+                위해 밝기 변화가 필요합니다.
+              </figcaption>
+            </figure>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="why-event-generation-is-required"
+            data-search-title="이벤트 생성이 필요한 이유"
+          >
+            <h3>2.2 이벤트 생성이 필요한 이유</h3>
+            <p>
+              NRV DVS 캘리브레이션에는 알려진 캘리브레이션 포인트 위치에서
+              명확한 ON event와 OFF event가 필요합니다. 따라서 캘리브레이션 타겟은
+              깜빡이거나, 움직이거나, 시간에 따라 밝기가 변해야 합니다. 이
+              시스템에서는 모니터에 blinking circle grid를 표시합니다.
+            </p>
+            <p>
+              원들은 밝은 상태와 어두운 상태를 번갈아 가집니다. 원이 어두운
+              상태에서 밝은 상태로 바뀌면 NRV DVS는 원의 경계 주변에서 ON event를
+              생성합니다. 반대로 밝은 상태에서 어두운 상태로 바뀌면 OFF event가
+              생성됩니다. 목적은 NRV DVS가 원의 위치를 안정적인 event
+              데이터로 볼 수 있게 만드는 것입니다.
+            </p>
+
+            <figure class="doc-figure comparison-figure">
+              <div class="figure-label">ON / OFF event 생성</div>
+              <div class="figure-grid two-up">
+                <div>
+                  <img
+                    src="assets/github-dvs-2.png"
+                    alt="회색 배경 위의 밝은 원 그리드 상태"
+                  />
+                  <span>밝은 상태 → ON event</span>
+                </div>
+                <div>
+                  <img
+                    src="assets/github-dvs-3.png"
+                    alt="회색 배경 위의 어두운 원 그리드 상태"
+                  />
+                  <span>어두운 상태 → OFF event</span>
+                </div>
+              </div>
+              <figcaption>
+                깜빡이는 원은 알려진 캘리브레이션 포인트 주변에서 ON event와
+                OFF event를 생성합니다.
+              </figcaption>
+            </figure>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="why-blinking-circle-grid-is-used"
+            data-search-title="Blinking Asymmetric Circle Grid를 사용하는 이유"
+          >
+            <h3>2.3 Blinking Asymmetric Circle Grid를 사용하는 이유</h3>
+            <p>
+              NRV DVS용 캘리브레이션 타겟은 event 데이터에서 보여야 하고,
+              각 포인트의 중심을 안정적으로 측정할 수 있어야 하며, 검출된 포인트를
+              일관된 순서로 식별할 수 있어야 합니다. Blinking asymmetric circle
+              grid는 이 세 가지 조건을 각각 만족시키기 때문에 사용합니다.
+            </p>
+
+            <div class="rationale-grid" aria-label="패턴이 깜빡이고 비대칭 원 배열을 사용하는 이유">
+              <div class="rationale-card">
+                <span>01 · Blinking</span>
+                <strong>패턴이 event로 보이게 합니다</strong>
+                <p>
+                  밝음과 어두움 사이의 전환이 알려진 캘리브레이션 포인트 위치에서
+                  ON event와 OFF event를 의도적으로 생성합니다.
+                </p>
+              </div>
+              <div class="rationale-card">
+                <span>02 · Circles</span>
+                <strong>각 포인트의 중심을 측정하게 합니다</strong>
+                <p>
+                  서로 떨어진 원 경계는 독립된 event 묶음을 만들며, 이를 모아 각
+                  캘리브레이션 포인트의 circle center를 추정할 수 있습니다.
+                </p>
+              </div>
+              <div class="rationale-card">
+                <span>03 · Asymmetry</span>
+                <strong>포인트 순서를 식별하게 합니다</strong>
+                <p>
+                  행마다 교대로 어긋난 배열은 구별 가능한 구조를 만들기 때문에
+                  검출기가 행과 열의 순서를 일관되게 지정할 수 있습니다.
+                </p>
+              </div>
+            </div>
+
+            <p class="rationale-summary">
+              <strong>정리하면:</strong> blinking은 타겟을 event로 보이게 하고,
+              circle은 각 포인트의 중심을 측정하게 하며, asymmetric layout은
+              검출된 포인트의 순서를 식별하게 합니다.
+            </p>
+
+            <p>
+              원들이 공간적으로 떨어져 있으므로 하나의 원에서 발생한 event를
+              이웃한 캘리브레이션 포인트와 섞지 않고 모을 수 있습니다. 원 주변의
+              edge event에는 circle center를 계산할 수 있는 기하 정보가 포함되며,
+              촬영 위치와 각도가 달라져도 중심은 비교적 명확한 특징으로 남습니다.
+            </p>
+            <p>
+              반면 checkerboard corner는 event 데이터에서 복원하기가 더 어렵습니다.
+              여러 흑백 edge가 한 위치에서 만나므로 서로 다른 edge에서 발생한
+              ON/OFF event가 교차점 주변에서 겹치거나 분산될 수 있습니다. 카메라
+              움직임, 밝기 변화 시점, 모니터 refresh 상태에 따라 관측되는 corner
+              위치도 흔들릴 수 있습니다. 특히 checkerboard를 모니터에서 blink하면
+              모니터가 밝기 변화를 이상적인 기하학적 corner로 한 순간에 출력하지
+              못할 수 있습니다. 이 경우 NRV DVS는 정확한 corner point가
+              아니라 번지거나 끊어진 corner 응답을 기록하게 되어 검출이
+              불안정해집니다. 독립된 원은 더 단순한 지역 event 묶음을 만들기 때문에
+              캘리브레이션 포인트를 안정적으로 검출하기 쉽습니다.
+            </p>
+            <p>
+              비대칭 배열도 중요합니다. 인접한 행이 완전히 대칭인 격자를 이루지
+              않고 서로 어긋나 있으므로, 검출기는 이 구조를 기준으로 포인트 인덱스와
+              행·열 순서를 일관되게 지정할 수 있습니다.
+            </p>
+            <p>
+              마지막으로 모니터를 사용하면 밝기 전환을 직접 제어할 수 있으며,
+              인쇄된 보드나 별도의 점멸 조명 장치를 준비할 필요가 없습니다.
+            </p>
+
+            <figure class="doc-figure comparison-figure">
+              <div class="figure-label">Checkerboard corner vs. 분리된 asymmetric circle point</div>
+              <div class="figure-grid two-up">
+                <div>
+                  <img
+                    src="assets/github-dvs-8.jpg"
+                    alt="corner 응답이 겹치는 checkerboard event 예시"
+                  />
+                  <span>Checkerboard: corner에서 event가 만남</span>
+                </div>
+                <div>
+                  <img
+                    src="assets/asymmetric-circle-grid-corner-overlay.png"
+                    alt="NRV DVS 캘리브레이션 데이터 위에 검출된 비대칭 원 그리드 중심을 표시한 예시"
+                  />
+                  <span>Asymmetric circle grid: 분리된 캘리브레이션 포인트</span>
+                </div>
+              </div>
+              <figcaption>
+                왼쪽 checkerboard 예시는 blink된 corner가 event 데이터에서
+                안정적으로 잡히기 어려운 경우를 보여줍니다. 모니터 refresh와 밝기
+                변화 타이밍 때문에 정확한 corner event가 형성되지 않을 수 있습니다.
+                반면 서로 떨어진 원 포인트는 안정적인 캘리브레이션 중심을 추정하기
+                쉽고, 비대칭 배열은 일관된 포인트 순서를 제공합니다.
+              </figcaption>
+            </figure>
+          </section>
+
+          <section
+            class="doc-section searchable-section"
+            id="calibration-pattern-configuration"
+            data-search-title="캘리브레이션 패턴 구성"
+          >
+            <h3>2.4 캘리브레이션 패턴 구성</h3>
+            <p>
+              Blinking asymmetric circle grid는 모니터에 전체화면으로 표시됩니다.
+              배경은 회색이며, 원은 밝은 값과 어두운 값을 번갈아 가집니다. 비대칭
+              배열을 사용하면 캘리브레이션 포인트의 순서를 대칭 그리드와 혼동하지
+              않고 고유하게 식별할 수 있습니다.
+            </p>
+            <div class="concept-callout">
+              <span>패턴 개념</span>
+              <h4>Asymmetric circle grid란?</h4>
+              <p>
+                Asymmetric circle grid는 서로 떨어진 원형 점들을 엇갈린 행으로
+                배치한 캘리브레이션 타깃입니다. checkerboard처럼 여러 edge가
+                만나는 corner를 찾는 방식이 아니라, 각 원의 중심을 캘리브레이션
+                포인트로 사용합니다.
+              </p>
+              <p>
+                생성된 패턴에서는 같은 행의 원 중심 간격이 일정하고, 행 사이
+                간격도 패턴 정의에 따라 일정하게 유지됩니다. 인접한 행이 서로
+                어긋나 있으므로 패턴 방향이 고유하게 정해지고, 검출된 포인트
+                순서를 안정적으로 배정할 수 있습니다. 그래서 asymmetric circle
+                grid는 카메라 캘리브레이션에서 흔하게 사용되는 패턴 중 하나입니다.
+              </p>
+            </div>
+            <p>
+              행 개수, 열 개수, 원 사이 간격, 원 지름은 캘리브레이션 프로그램의
+              설정과 일치해야 합니다. 또한 NRV DVS가 각 원을 명확히 분리해서 볼 수
+              있을 만큼 패턴이 충분히 커야 합니다.
+            </p>
+            <p>
+              참고 저장소의 예시 구성은 11 columns, 4 rows, gray background,
+              bright circle value 255, dark circle value 0이며, 시간에 따라 원
+              색상을 toggle하여 blink를 만듭니다. 이 값들은 필수값이 아닙니다.
+              모니터 크기, 카메라 거리, 캘리브레이션 구성에 따라 조정할 수
+              있습니다.
+            </p>
+
+            <figure class="doc-figure pattern-figure">
+              <div class="figure-label">Asymmetric circle grid pattern</div>
+              <img
+                src="assets/github-dvs-2.png"
+                alt="회색 배경 위에 밝은 원이 표시된 전체 비대칭 원 그리드 패턴"
+              />
+              <div class="pattern-specs" aria-label="예시 패턴 구성">
+                <span>예시: 11 columns</span>
+                <span>예시: 4 rows</span>
+                <span>Spacing: 원 중심 간 거리</span>
+                <span>행은 엇갈리게 배치</span>
+                <span>Gray background</span>
+                <span>Bright 255 / dark 0</span>
+                <span>간격과 지름은 구성에 맞게 조정</span>
+              </div>
+              <figcaption>
+                비대칭 원 그리드는 모노와 스테레오 NRV DVS 캘리브레이션에
+                사용할 수 있는 알려진 캘리브레이션 포인트 위치를 제공합니다.
+              </figcaption>
+            </figure>
+          </section>
+
+          <p class="transition-note">
+            Blinking asymmetric circle grid 패턴을 정의한 뒤에는 NRV DVS가 깨끗한
+            캘리브레이션 데이터를 기록할 수 있도록 안정적인 촬영 환경을 준비해야
+            합니다. 다음 섹션에서는 이 준비 과정을 이어서 설명합니다.
+          </p>
+
+          <p class="bottom-author">by jy</p>
+
+          <nav
+            class="chapter-switcher chapter-switcher-bottom"
+            aria-label="캘리브레이션 챕터 이동"
+          >
+            <span class="chapter-switcher-label">캘리브레이션 글 목록</span>
+            <div>
+              <a href="01-camera-calibration.html">1. 카메라 캘리브레이션이란?</a>
+              <a class="current" href="02-dvs-calibration-method.html" aria-current="page">2. NRV DVS 캘리브레이션 방법</a>
+              <a href="03-capture-preparation.html">3. 촬영 환경과 준비</a>
+            </div>
+          </nav>
+
+          <nav class="article-pager" aria-label="이전 글과 다음 글">
+            <a class="pager-link pager-prev" href="01-camera-calibration.html">
+              이전 글: 1. 카메라 캘리브레이션이란?
+            </a>
+            <a class="pager-link pager-next" href="03-capture-preparation.html">
+              다음 글: 3. 촬영 환경과 준비
+            </a>
+          </nav>
+
+          <p class="search-empty" role="status" hidden>
+            검색어와 일치하는 하위 섹션이 없습니다.
+          </p>
+
+          <footer class="page-footer">
+            <span>캘리브레이션 설명</span>
+            <a href="#top">맨 위로 ↑</a>
+          </footer>
+          <p class="repository-note">NRV의 지원을 받아 작성했으며, 공식 docs 홈페이지에는 영어 버전이 있습니다.</p>
+        </article>
+
+        <aside class="page-toc" aria-label="현재 페이지 목차">
+          <strong>현재 페이지</strong>
+          <a href="#difference-from-conventional-cameras">2.1 CIS 카메라와의 차이</a>
+          <a href="#why-event-generation-is-required">2.2 이벤트 생성이 필요한 이유</a>
+          <a href="#why-blinking-circle-grid-is-used">2.3 Blinking Asymmetric Circle Grid를 사용하는 이유</a>
+          <a href="#calibration-pattern-configuration">2.4 캘리브레이션 패턴 구성</a>
+        </aside>
+      </main>
+    </div>
+  </body>
+</html>
