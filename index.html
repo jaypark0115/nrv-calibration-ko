@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Jay의 기술 글, 실험 기록, NRV DVS 캘리브레이션 한국어 설명 모음." />
+    <meta name="description" content="제가 정리한 기술 글, 실험 기록, NRV DVS 캘리브레이션 한국어 설명 모음." />
     <title>Jay Tech Notes</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
   </head>
-  <body>
+  <body class="home-page">
 <div class="site-shell">
 <main class="content-wrap" id="top">
         <article class="content">
@@ -37,11 +37,11 @@
               </p>
             </section>
             <section class="home-panel">
-              <span>Coming later</span>
-              <h2>논문 · 프로젝트 · 실험 노트</h2>
+              <span>Project links</span>
+              <h2>공개 프로젝트</h2>
               <p>
-                이후에는 개인 연구 기록과 프로젝트 자료도 같은 형식으로
-                하나씩 추가해갈 예정입니다.
+                캘리브레이션 글과 함께 볼 수 있는 GitHub 프로젝트도
+                별도의 글 묶음으로 정리합니다.
               </p>
             </section>
           </div>
@@ -50,6 +50,7 @@
             <span class="chapter-switcher-label">현재 공개된 글 묶음</span>
             <div>
               <a href="#nrv-dvs-calibration">NRV DVS 캘리브레이션 설명</a>
+              <a href="#github-projects">GitHub 프로젝트 링크</a>
             </div>
           </nav>
 
@@ -65,7 +66,7 @@
               <strong>작성 안내</strong>
               <span>
                 아래의 <b>NRV DVS 캘리브레이션</b> 글 3개는 NRV의 지원을 받아 작성한
-                한국어 설명 자료입니다. 이 첫 화면은 Jay의 개인 글 목록이며,
+                한국어 설명 자료입니다. 이 첫 화면은 제가 개인적으로 정리한 글 목록이며,
                 앞으로 추가되는 개인 논문이나 프로젝트 글 전체가 NRV 공식 문서라는
                 뜻은 아닙니다. 캘리브레이션 글의 공식 영문 버전은 NRV docs에서
                 확인할 수 있습니다.
@@ -86,6 +87,32 @@
                 <span class="sitemap-number">03</span>
                 <h2>3. 촬영 환경과 준비</h2>
                 <p>캘리브레이션 데이터를 얻기 전 필요한 장비, 모니터 설정, 원 간격 측정, 카메라 고정 조건을 설명합니다.</p>
+              </a>
+            </div>
+          </section>
+
+          <section class="doc-section visible" id="github-projects">
+            <h2>GitHub 프로젝트 링크</h2>
+            <p>
+              아래 프로젝트는 NRV DVS 캘리브레이션 설명과 별도로 공개한 개인 GitHub 프로젝트입니다.
+              자세한 사용법과 코드는 각 저장소에서 확인할 수 있습니다.
+            </p>
+            <div class="project-grid">
+              <a class="project-card" href="https://github.com/jaypark0115/blinking-circle-grid-for-dvs-calibration" target="_blank" rel="noopener noreferrer">
+                <span>Calibration target</span>
+                <h2>blinking-circle-grid-for-dvs-calibration</h2>
+                <p>
+                  NRV DVS 캘리브레이션에 사용할 blinking asymmetric circle grid 패턴을
+                  모니터에 표시하기 위한 프로젝트입니다.
+                </p>
+              </a>
+              <a class="project-card" href="https://github.com/jaypark0115/event-arduino-stopwatch-target" target="_blank" rel="noopener noreferrer">
+                <span>Event camera target</span>
+                <h2>event-arduino-stopwatch-target</h2>
+                <p>
+                  이벤트 카메라 실험에서 시간 변화가 있는 타깃을 구성하고 확인하기 위한
+                  Arduino 기반 스톱워치 타깃 프로젝트입니다.
+                </p>
               </a>
             </div>
           </section>
