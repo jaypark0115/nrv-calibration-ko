@@ -288,6 +288,21 @@ img {
   text-transform: uppercase;
 }
 
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 1.35rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.home-link:hover {
+  color: var(--nrv-red-dark);
+}
+
 .draft-label {
   padding: 0.25rem 0.55rem;
   border: 1px solid #efc5cd;
@@ -412,7 +427,7 @@ p {
 }
 
 .lead {
-  max-width: 800px;
+  max-width: 920px;
   margin-bottom: 1.65rem;
   color: #4b5563;
   font-size: 1.09rem;
@@ -1684,9 +1699,9 @@ p {
 /* Standalone GitHub Pages additions */
 .source-note {
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 160px minmax(0, 1fr);
   gap: 24px;
-  align-items: center;
+  align-items: start;
   margin: 28px 0 42px;
   padding: 22px 26px;
   border: 1px solid var(--border, #dfe4ea);
@@ -1697,6 +1712,12 @@ p {
 .source-note strong {
   color: var(--ink, #111827);
   font-size: 1.05rem;
+}
+.source-note span {
+  line-height: 1.75;
+}
+.source-note b {
+  color: var(--ink, #111827);
 }
 .sitemap-grid {
   display: grid;
