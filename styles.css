@@ -1823,13 +1823,13 @@ p {
 /* Jay Tech Notes home page: keep the article pages in the NRV red style,
    but make the landing page feel more like a personal technical homepage. */
 body.home-page {
-  --nrv-red: #2563eb;
-  --nrv-red-dark: #1d4ed8;
-  --accent: #2563eb;
-  --accent-soft: #eff6ff;
+  --nrv-red: #0f766e;
+  --nrv-red-dark: #115e59;
+  --accent: #0f766e;
+  --accent-soft: #ecfdf5;
   --border: #dfe6f0;
   background:
-    radial-gradient(circle at 12% 4%, rgb(37 99 235 / 7%), transparent 28%),
+    radial-gradient(circle at 12% 4%, rgb(20 184 166 / 9%), transparent 28%),
     radial-gradient(circle at 86% 2%, rgb(15 23 42 / 5%), transparent 24%),
     #ffffff;
 }
@@ -1874,7 +1874,7 @@ body.home-page .source-note {
 }
 
 body.home-page .chapter-switcher a:hover {
-  border-color: rgb(37 99 235 / 28%);
+  border-color: rgb(15 118 110 / 28%);
   color: var(--accent);
 }
 
@@ -1887,7 +1887,7 @@ body.home-page .sitemap-card:hover {
 }
 
 body.home-page .sitemap-number {
-  border-color: #bfdbfe;
+  border-color: #99f6e4;
   background: var(--accent-soft);
   color: var(--accent);
 }
@@ -1902,9 +1902,10 @@ body.home-page .sitemap-number {
 .project-card {
   display: block;
   min-height: 230px;
-  padding: 30px 32px;
+  overflow: hidden;
+  padding: 0 0 30px;
   border: 1px solid var(--border, #dfe4ea);
-  border-top: 4px solid #334155;
+  border-top: 4px solid var(--accent, #0f766e);
   background: #fff;
   color: inherit;
   text-decoration: none;
@@ -1917,14 +1918,26 @@ body.home-page .sitemap-number {
 
 .project-card:hover {
   transform: translateY(-3px);
-  border-color: var(--accent, #2563eb);
+  border-color: var(--accent, #0f766e);
   box-shadow: 0 24px 52px rgba(15, 23, 42, 0.1);
 }
 
-.project-card span {
+.project-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border, #dfe4ea);
+  background: #e2e8f0;
+}
+
+.project-card .sitemap-number {
+  margin: 26px 30px 16px;
+}
+
+.project-card small {
   display: block;
-  margin-bottom: 14px;
-  color: var(--accent, #2563eb);
+  margin: 0 30px 12px;
+  color: var(--accent, #0f766e);
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.1em;
@@ -1932,7 +1945,7 @@ body.home-page .sitemap-number {
 }
 
 .project-card h2 {
-  margin: 0 0 14px;
+  margin: 0 30px 14px;
   font-size: 1.28rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -1943,7 +1956,7 @@ body.home-page .sitemap-number {
 }
 
 .project-card p {
-  margin: 0;
+  margin: 0 30px;
   color: var(--muted, #64748b);
   line-height: 1.75;
 }
