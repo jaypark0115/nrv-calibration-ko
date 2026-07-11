@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="숭실대학교 동계 학부생연구인턴에서 학습한 AXI channel, valid-ready handshake, write/read path 정리." />
+    <meta name="description" content="숭실대학교 동계 학부생연구인턴에서 학습한 AXI channel, valid-ready handshake, Lab7 AXI slave 실습 정리." />
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -32,35 +32,34 @@
 
           <h1 id="axi-channel-bus">3. AXI Channel Bus</h1>
           <p class="lead">
-            AXI는 address, data, response 흐름을 여러 독립 채널로 나누어 높은 처리량과 유연성을 얻는 AMBA bus protocol입니다.
-            APB가 단순 register 제어에 적합하고 AHB가 phase pipeline을 보여 준다면, AXI는 요청과 응답을 채널별 handshake로
-            분리해 더 복잡한 SoC 내부 연결을 다룹니다. 숭실대 인턴에서는 AXI의 AW/W/B, AR/R 채널 구조와 valid-ready handshake를
-            정리했고, 최종 프로젝트에서는 이 AXI 요청을 APB register access로 변환하는 bridge를 구현했습니다.
+            AXI는 고성능 SoC에서 많이 쓰이는 channel 기반 bus입니다. APB는 register 제어에 단순하고, AHB는 address/data phase가
+            pipeline처럼 겹쳐 흐르는 구조였다면, AXI는 write 주소, write data, write response, read 주소, read data를 서로 다른 채널로
+            분리합니다. 숭실대 인턴에서는 이 구조를 Lab7 AXI slave 실습으로 확인했습니다.
           </p>
 
           <div class="scope-note" role="note">
             <strong>이 페이지의 범위</strong>
-            <span>AXI write/read 채널, valid-ready handshake, burst/ID/outstanding 개념, 최종 프로젝트에서 single transfer로 범위를 제한한 이유를 정리합니다.</span>
+            <span>AXI의 5개 channel, VALID/READY handshake, burst read/write, Lab7 AXI slave register block 검증을 설명합니다.</span>
           </div>
 
           <section class="doc-section searchable-section" id="axi-channel-structure" data-search-title="AXI channel structure">
-            <h3>3.1 AXI가 채널을 나누는 이유</h3>
+            <h3>3.1 AXI가 어려운 이유: 하나의 전송이 여러 채널로 나뉜다</h3>
             <p>
-              AXI를 처음 볼 때 가장 헷갈리는 부분은 신호가 한 묶음으로 움직이지 않는다는 점입니다. write transaction도 주소,
-              데이터, 응답이 각각 다른 채널로 나뉘고, read transaction도 주소 요청과 data 반환이 분리됩니다. 이렇게 나누면 주소를
-              보내는 시점, data를 보내는 시점, 응답을 받는 시점을 독립적으로 조절할 수 있습니다.
+              AXI를 처음 볼 때 가장 헷갈리는 점은 write/read가 한 덩어리로 움직이지 않는다는 것입니다. write transaction은 AW, W, B 세 채널로,
+              read transaction은 AR, R 두 채널로 나뉩니다. 그래서 AXI에서는 “주소를 보냈는가”, “데이터를 보냈는가”, “응답을 받았는가”를
+              각각 따로 확인해야 합니다.
             </p>
             <p>
-              초심자에게는 AXI를 “여러 차선이 있는 도로”처럼 보는 것이 이해하기 쉽습니다. APB가 한 차선에서 순서대로 register를
-              읽고 쓰는 느낌이라면, AXI는 write 주소 차선, write data 차선, write 응답 차선, read 주소 차선, read data 차선을 따로
-              둡니다. 각 차선은 자신의 valid-ready 조건이 맞을 때만 한 beat의 정보를 넘깁니다.
+              수업에서는 이 구조를 AHB와 비교했습니다. AHB는 하나의 bus에서 address phase와 data phase가 겹치는 구조였지만,
+              AXI는 아예 read/write 경로와 address/data/response 경로를 독립 채널로 나눕니다. 그 대신 각 채널은 VALID/READY handshake로
+              전송 성립 시점을 명확히 정합니다.
             </p>
             <div class="concept-callout">
-              <span>AXI 이해의 핵심</span>
-              <h4>전송은 VALID와 READY가 같은 cycle에 함께 올라올 때 성립합니다</h4>
+              <span>핵심 규칙</span>
+              <h4>VALID와 READY가 같은 cycle에 함께 올라올 때만 그 채널의 전송이 성립합니다</h4>
               <p>
                 VALID는 보내는 쪽이 “지금 정보가 유효하다”고 말하는 신호이고, READY는 받는 쪽이 “지금 받을 수 있다”고 말하는 신호입니다.
-                두 신호가 동시에 만족될 때 해당 채널의 transfer가 완료됩니다.
+                둘 중 하나만 올라오면 아직 transfer가 끝난 것이 아닙니다.
               </p>
             </div>
           </section>
@@ -68,52 +67,60 @@
           <section class="doc-section searchable-section" id="axi-write-read" data-search-title="AXI write read path">
             <h3>3.2 Write path와 Read path</h3>
             <p>
-              AXI write는 AW, W, B 세 채널로 구성됩니다. AW 채널은 “어디에 쓸 것인가”를 전달하고, W 채널은 “무슨 값을 쓸 것인가”를
-              전달하며, B 채널은 “write가 어떻게 끝났는가”를 응답합니다. read는 AR, R 두 채널로 구성됩니다. AR 채널은 “어디를 읽을 것인가”를
-              전달하고, R 채널은 해당 주소의 data와 응답을 반환합니다.
+              write는 AW, W, B 순서로 이해하면 됩니다. AW channel은 write할 주소를 전달하고, W channel은 실제 data를 전달하며,
+              B channel은 write가 끝났다는 response를 slave가 master에게 돌려주는 경로입니다. read는 AR, R로 나뉩니다.
+              AR channel은 read할 주소를 전달하고, R channel은 read data와 response를 반환합니다.
             </p>
             <dl class="step-definitions">
-              <div><dt>AW channel</dt><dd>write address와 control 정보를 전달합니다. AWVALID/AWREADY가 동시에 만족될 때 주소 요청이 받아들여집니다.</dd></div>
-              <div><dt>W channel</dt><dd>write data를 전달합니다. burst transfer에서는 WLAST가 마지막 data beat를 표시할 수 있습니다.</dd></div>
-              <div><dt>B channel</dt><dd>write transaction의 응답을 반환합니다. bridge 구현에서는 write가 APB 쪽에서 끝난 뒤 B response를 돌려주는 흐름을 만들었습니다.</dd></div>
-              <div><dt>AR channel</dt><dd>read address와 control 정보를 전달합니다. read 요청의 시작점입니다.</dd></div>
-              <div><dt>R channel</dt><dd>read data와 response를 반환합니다. APB slave에서 읽은 register 값이 이 채널로 AXI master에게 돌아갑니다.</dd></div>
+              <div><dt>AW</dt><dd>Write address channel. 어디에 쓸지 전달합니다.</dd></div>
+              <div><dt>W</dt><dd>Write data channel. 어떤 값을 쓸지 전달하고, burst에서는 WLAST로 마지막 beat를 표시합니다.</dd></div>
+              <div><dt>B</dt><dd>Write response channel. write transaction이 정상적으로 끝났는지 반환합니다.</dd></div>
+              <div><dt>AR</dt><dd>Read address channel. 어디를 읽을지 전달합니다.</dd></div>
+              <div><dt>R</dt><dd>Read data channel. 읽은 data와 response를 반환하고, RLAST로 마지막 beat를 표시합니다.</dd></div>
             </dl>
           </section>
 
-          <section class="doc-section searchable-section" id="axi-advanced" data-search-title="AXI advanced concepts">
-            <h3>3.3 Burst, ID, outstanding을 어떻게 바라봤는가</h3>
+          <section class="doc-section searchable-section" id="axi-lab7" data-search-title="AXI Lab7 실습">
+            <h3>3.3 Lab7에서 한 일: AXI slave register block</h3>
             <p>
-              AXI에는 burst, ID, outstanding transaction처럼 고성능 시스템을 위한 기능이 있습니다. burst는 연속된 data beat를 한 transaction으로
-              묶어 전송하는 개념이고, ID는 여러 transaction을 구분하기 위한 표식입니다. outstanding transaction은 이전 요청의 응답을 기다리는 동안
-              다음 요청을 추가로 보낼 수 있는 구조를 의미합니다. 이런 기능은 AXI가 APB보다 훨씬 복잡한 이유이기도 합니다.
+              Lab7에서는 AXI slave interface를 가진 register block을 구현했습니다. 내부에는 입력 register A/B와 출력 register C가 있고,
+              AXI write transaction으로 A/B를 쓰고 AXI read transaction으로 A/B/C 값을 읽는 구조입니다. Lab2와 Lab5에서 다뤘던 register access가
+              AXI channel 구조로 바뀐 버전이라고 볼 수 있습니다.
             </p>
             <p>
-              다만 최종 프로젝트에서는 처음부터 모든 AXI 기능을 구현하지 않았습니다. 먼저 single transfer 중심으로 범위를 좁혀,
-              하나의 AXI write/read 요청이 APB register access로 정확히 변환되는지를 확인했습니다. 버스 설계에서 중요한 것은 기능을
-              많이 넣는 것보다, 현재 구현 범위에서 handshake와 응답을 끝까지 닫는 것입니다.
+              이 실습에서 중요한 점은 write와 read가 각각 다른 채널 흐름을 가진다는 것입니다. write에서는 AW handshake로 주소를 받고,
+              W handshake로 data를 받은 뒤, B response를 반환해야 합니다. read에서는 AR handshake로 주소를 받고, R channel로 data를 반환해야 합니다.
+              Lab7 RTL은 1~4 beat burst를 다루며, word-aligned address와 OKAY response를 기준으로 동작하도록 구성되어 있었습니다.
             </p>
+            <div class="lab-timeline">
+              <article>
+                <span>Write</span>
+                <h4>AW → W → B</h4>
+                <p>주소 handshake, data beat 전송, response 반환 순서가 맞는지 검증했습니다.</p>
+              </article>
+              <article>
+                <span>Read</span>
+                <h4>AR → R</h4>
+                <p>read 주소를 받은 뒤 data와 response를 R channel로 반환하고 RLAST를 확인했습니다.</p>
+              </article>
+              <article>
+                <span>검증 관점</span>
+                <h4>채널별 책임 분리</h4>
+                <p>주소, data, response가 서로 다른 handshake 조건으로 움직이므로 파형을 채널별로 나누어 봤습니다.</p>
+              </article>
+            </div>
           </section>
 
-          <section class="doc-section searchable-section" id="axi-project-scope" data-search-title="AXI 프로젝트 범위">
-            <h3>3.4 최종 프로젝트로 이어진 구현 관점</h3>
-            <p>
-              AXI 학습의 목표는 신호 이름을 외우는 것이 아니라, 채널별 책임을 분리해서 보는 것이었습니다. write path에서는 AW와 W가
-              모두 들어온 뒤 APB write를 시작해야 하고, read path에서는 AR 요청을 받은 뒤 APB read 결과를 R channel로 반환해야 합니다.
-              이 관점은 AXI-to-APB Bridge에서 write FSM과 read FSM을 분리해 구현하는 기준이 되었습니다.
-            </p>
-          </section>
-
-          <section class="doc-section searchable-section" id="axi-references" data-search-title="AXI 참고 자료">
-            <h3>3.5 참고한 공식 자료</h3>
-            <p>
-              Arm의 AMBA specification 페이지는 AXI를 AMBA 5의 주요 protocol 중 하나로 정리하고 있으며, AXI protocol specification도
-              별도로 제공합니다. 이 페이지는 숭실대 수업자료와 Arm AMBA specification 구조를 함께 참고해 bridge 구현 관점으로 다시 정리했습니다.
-            </p>
-            <ul class="technical-references">
-              <li><a href="https://www.arm.com/architecture/system-architectures/amba/amba-specifications" target="_blank" rel="noopener noreferrer">Arm AMBA Specifications</a></li>
-              <li><a href="https://developer.arm.com/documentation/ihi0022/latest/" target="_blank" rel="noopener noreferrer">Arm AMBA AXI Protocol Specification</a></li>
-            </ul>
+          <section class="doc-section searchable-section" id="axi-waveform" data-search-title="AXI 파형 검증">
+            <h3>3.4 파형으로 확인한 AXI 동작</h3>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">Lab7 - AXI channel handshake waveform</div>
+              <img src="assets/soongsil-lab7-axi-waveform.png" alt="Lab7 AXI channel handshake SimVision 파형" />
+              <figcaption>
+                Lab7 파형에서는 AWVALID/AWREADY, WVALID/WREADY, BVALID/BREADY, ARVALID/ARREADY, RVALID/RREADY/RLAST가
+                각 채널에서 독립적으로 움직이는 것을 확인했습니다. 이 경험이 최종 AXI-to-APB Bridge에서 AXI 쪽 FSM을 분리해 보는 기준이 되었습니다.
+              </figcaption>
+            </figure>
           </section>
 
           <footer class="page-footer">

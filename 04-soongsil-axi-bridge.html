@@ -22,15 +22,29 @@
           <a class="home-link" href="index.html#hardware-notes">← Jay Tech Notes로 돌아가기</a>
           <h1>SoC/FPGA Bus 학습 노트</h1>
           <p class="lead">
-            이 노트는 한 페이지짜리 정리문이 아니라 APB, AHB, AXI, AXI-to-APB Bridge로 나누어 다시 정리했습니다.
-            아래 카드에서 원하는 개념으로 이동할 수 있습니다.
+            이 노트는 한 페이지짜리 요약문이 아니라 APB, AHB, AXI, AXI-to-APB Bridge로 나누어 정리했습니다.
+            각 페이지는 수업자료에서 다룬 개념, Lab별 RTL/TB 실습, 파형 검증 이미지를 함께 보도록 구성했습니다.
           </p>
           <div class="sitemap-grid hardware-card-grid">
-            <a class="sitemap-card" href="04-apb-bus.html"><span class="sitemap-number">01</span><h2>APB Control Bus</h2><p>Peripheral register 제어와 setup-enable transfer를 설명합니다.</p></a>
-            <a class="sitemap-card" href="05-ahb-bus.html"><span class="sitemap-number">02</span><h2>AHB Pipelined Bus</h2><p>Address/data phase 중첩과 HREADY/HRESP timing을 설명합니다.</p></a>
-            <a class="sitemap-card" href="06-axi-bus.html"><span class="sitemap-number">03</span><h2>AXI Channel Bus</h2><p>독립 채널과 valid-ready handshake를 설명합니다.</p></a>
-            <a class="sitemap-card" href="07-axi-to-apb-bridge.html"><span class="sitemap-number">04</span><h2>AXI-to-APB Bridge</h2><p>Verilog RTL 구현과 testbench/waveform 검증을 설명합니다.</p></a>
+            <a class="sitemap-card" href="04-apb-bus.html"><span class="sitemap-number">01</span><h2>APB Control Bus</h2><p>Lab2~4의 register, SRAM, interrupt 실습을 설명합니다.</p></a>
+            <a class="sitemap-card" href="05-ahb-bus.html"><span class="sitemap-number">02</span><h2>AHB Pipelined Bus</h2><p>Lab5~6의 AHB register/SRAM 실습과 HREADY timing을 설명합니다.</p></a>
+            <a class="sitemap-card" href="06-axi-bus.html"><span class="sitemap-number">03</span><h2>AXI Channel Bus</h2><p>Lab7의 AXI slave channel handshake를 설명합니다.</p></a>
+            <a class="sitemap-card" href="07-axi-to-apb-bridge.html"><span class="sitemap-number">04</span><h2>AXI-to-APB Bridge</h2><p>최종 protocol conversion RTL과 PASS 검증을 설명합니다.</p></a>
           </div>
+          <section class="doc-section visible" id="lab-flow">
+            <h2>수업자료 기준 Lab 진행 흐름</h2>
+            <p>
+              숭실대 강의자료의 흐름은 환경 구축에서 시작해 APB, AHB, AXI를 차례로 다루고,
+              마지막에는 AXI 요청을 APB register access로 변환하는 프로젝트로 이어졌습니다.
+              아래 흐름은 각 개념 페이지가 어떤 Lab 근거를 바탕으로 작성되었는지 보여 주기 위한 요약입니다.
+            </p>
+            <div class="lab-timeline">
+              <article><span>Lab1</span><h4>환경 및 Testbench</h4><p>Linux, Xcelium, SimVision, Verilog testbench 실행 흐름을 확인했습니다.</p></article>
+              <article><span>Lab2~4</span><h4>APB 기반 제어</h4><p>Register access에서 SRAM, interrupt/mask 구조까지 APB 제어 범위를 확장했습니다.</p></article>
+              <article><span>Lab5~6</span><h4>AHB 기반 접근</h4><p>AHB register access와 SP-SRAM 접근을 통해 phase pipeline과 HREADY timing을 확인했습니다.</p></article>
+              <article><span>Lab7 / Project</span><h4>AXI와 Bridge</h4><p>AXI slave channel handshake를 검증한 뒤 AXI-to-APB Bridge 최종 프로젝트로 연결했습니다.</p></article>
+            </div>
+          </section>
         </article>
       </main>
     </div>

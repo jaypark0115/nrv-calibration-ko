@@ -1438,39 +1438,6 @@ p {
   cursor: default;
 }
 
-.technical-references {
-  margin-top: 1.2rem;
-  padding: 0.9rem 1.1rem;
-  border: 1px solid var(--line);
-  background: #fff;
-  color: var(--muted);
-  font-size: 0.86rem;
-}
-
-.technical-references summary {
-  cursor: pointer;
-  color: var(--ink);
-  font-weight: 800;
-}
-
-.technical-references p {
-  margin: 0.85rem 0 0.5rem;
-}
-
-.technical-references ul {
-  margin: 0.4rem 0 0;
-  padding-left: 1.2rem;
-}
-
-.technical-references li {
-  margin: 0.28rem 0;
-}
-
-.technical-references a {
-  color: var(--nrv-red-dark);
-  text-underline-offset: 0.15em;
-}
-
 .page-toc {
   position: sticky;
   top: 2.5rem;
@@ -2173,22 +2140,44 @@ body.home-page .sitemap-number {
   }
 }
 
-.technical-references {
-  margin: 1rem 0 0;
-  padding: 1rem 1.15rem 1rem 1.35rem;
+.lab-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin: 26px 0 34px;
+}
+
+.lab-timeline article {
+  padding: 1.1rem 1.15rem;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--nrv-red);
-  background: rgb(250 247 241 / 72%);
-  color: var(--muted);
+  border-top: 4px solid var(--nrv-red);
+  background: #fff;
+  box-shadow: var(--soft-shadow);
 }
 
-.technical-references li + li {
-  margin-top: 0.45rem;
-}
-
-.technical-references a {
+.lab-timeline span {
+  display: inline-flex;
+  margin-bottom: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid rgb(213 15 52 / 22%);
+  background: rgb(213 15 52 / 6%);
   color: var(--nrv-red-dark);
-  font-weight: 800;
-  text-decoration-thickness: 0.08em;
-  text-underline-offset: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lab-timeline h4 {
+  margin: 0 0 0.45rem;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.lab-timeline p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
 }
