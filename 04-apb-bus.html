@@ -84,6 +84,14 @@
               Lab3에서는 같은 APB 접근을 SRAM으로 확장했고, Lab4에서는 interrupt 관련 register까지 붙였다.
               즉 APB는 “register 하나 읽고 쓰는 버스”에서 시작하지만, 실제로는 하드웨어 연산 시작, buffer 접근, interrupt 상태 관리까지 담당할 수 있다.
             </p>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - Lab2 APB register block diagram</div>
+              <img src="assets/soongsil-pdf-apb-lab2-block.png" alt="Lab2 APB interface and register block diagram from lecture slide" />
+              <figcaption>
+                APB interface block이 외부 bus 신호를 받아 내부 register write enable, write data, read enable, read data로 바꾼다.
+                오른쪽 function block은 입력 A/B를 받아 조합논리와 register를 거쳐 출력 C를 만든다.
+              </figcaption>
+            </figure>
             <div class="signal-table-wrap">
               <table class="signal-table">
                 <thead>
@@ -114,6 +122,14 @@
               <li><strong>Enable phase:</strong> PSEL=1, PENABLE=1. slave는 write라면 register에 값을 저장하고, read라면 PRDATA를 준비한다.</li>
               <li><strong>Ready:</strong> PREADY=1이면 해당 transfer가 완료된다. PREADY=0이면 enable phase가 유지되어 wait가 걸린다.</li>
             </ol>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - APB setup/enable timing</div>
+              <img src="assets/soongsil-pdf-apb-lab2-timing.png" alt="APB setup and enable timing diagram from lecture slide" />
+              <figcaption>
+                강의 타이밍도에서는 write/read 주소와 data가 먼저 안정되고, 다음 phase에서 APB transfer가 완료되는 흐름을 보여 준다.
+                실제 RTL을 읽을 때는 <code>PSEL</code>, <code>PENABLE</code>, <code>PWRITE</code>, <code>PADDR</code> 조합이 어느 clock에 내부 enable로 바뀌는지를 함께 확인해야 한다.
+              </figcaption>
+            </figure>
           </section>
 
           <section class="doc-section searchable-section" id="lab-rtl" data-search-title="APB RTL 구현">
@@ -121,27 +137,42 @@
             <p>
               Lab2의 APB interface block은 APB 신호를 내부 register 제어 신호로 바꾸는 역할을 한다.
               핵심은 주소와 phase 조건을 동시에 만족할 때만 write/read enable을 만드는 것이다.
-              예를 들어 입력 A register는 <code>PSEL=1</code>, <code>PENABLE=1</code>, <code>PWRITE=1</code>, <code>PADDR=0x0000</code>일 때 write된다.
-              입력 B는 0x0004, 출력 C read는 강의자료 기준 0x2000 주소에 대응한다.
+              강의자료는 setup/enable phase를 기준으로 transfer를 설명하고, 실습 RTL은 setup 조건(<code>PSEL=1</code>, <code>PENABLE=0</code>)에서 내부 write/read enable을 만든 뒤
+              enable phase(<code>PSEL=1</code>, <code>PENABLE=1</code>)에서 <code>PREADY</code>를 올려 transfer 완료를 표시한다.
+              즉 “주소를 해석하는 시점”과 “bus transfer가 완료되는 시점”을 나누어 구현한 구조다.
             </p>
             <div class="rtl-card">
-              <span>Lab2_ApbIfBlk.v - 주소 decode와 write/read enable 개념</span>
-              <pre><code>write A 조건 = PSEL & PENABLE & PWRITE & (PADDR == 16'h0000)
-write B 조건 = PSEL & PENABLE & PWRITE & (PADDR == 16'h0004)
-read  C 조건 = PSEL & PENABLE & ~PWRITE & (PADDR == 출력 register 주소)</code></pre>
+              <span>Lab2_ApbIfBlk.v - 원 코드에서 본 구현 형태</span>
+              <pre><code>assign wWrEnInA = ((iPsel == 1'b1) & (iPenable == 1'b0)
+                 & (iPwrite == 1'b1) & (iPaddr == 16'h0000)) ? 1'b1 : 1'b0;
+
+assign wWrEnInB = ((iPsel == 1'b1) & (iPenable == 1'b0)
+                 & (iPwrite == 1'b1) & (iPaddr == 16'h0004)) ? 1'b1 : 1'b0;
+
+assign oPready  = (iPsel == 1'b1 && iPenable == 1'b1) ? 1'b1 : 1'b0;</code></pre>
             </div>
             <p>
               Lab3-1에서는 APB 접근이 SRAM read/write로 확장된다. 주소 0x4000, 0x4004, 0x4008, 0x400C가 4-depth SRAM entry로 대응되고,
               RTL에서는 <code>PADDR[3:2]</code>를 SRAM index로 사용한다. 이 구조를 보면 memory-mapped access가 무엇인지 분명해진다.
               software 입장에서는 주소에 write/read할 뿐이지만, hardware 내부에서는 그 주소가 SRAM chip select, write enable, address, write data로 바뀐다.
             </p>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - Lab3-1 APB to SP-SRAM 구조</div>
+              <img src="assets/soongsil-pdf-apb-lab3-sram.png" alt="Lab3-1 APB to SP-SRAM lecture slide" />
+              <figcaption>
+                APB 주소 0x4000부터 0x400C까지를 4-depth SRAM entry로 보고, APB bus access를 SRAM chip select, write/read, word address, data 신호로 변환한다.
+              </figcaption>
+            </figure>
             <div class="rtl-card">
-              <span>Lab3_1_ApbIfBlk.v - SRAM address 변환</span>
-              <pre><code>wWrEn   = PSEL & PENABLE &  PWRITE & SRAM address range
-wWrAddr = PADDR[3:2]
-wWrData = PWDATA[31:0]
-wRdEn   = PSEL & PENABLE & ~PWRITE & SRAM address range
-wRdAddr = PADDR[3:2]</code></pre>
+              <span>Lab3_1_ApbIfBlk.v - APB 주소를 SRAM 제어 신호로 변환</span>
+              <pre><code>assign wWrEn = ((iPsel == 1'b1) & (iPenable == 1'b0) & (iPwrite == 1'b1)
+              & (iPaddr == 16'h4000 || iPaddr == 16'h4004
+                                      || iPaddr == 16'h4008
+                                      || iPaddr == 16'h400C)) ? 1'b1 : 1'b0;
+
+assign wWrAddr = iPaddr[3:2];   // byte address -> word address
+assign oCsn    = (wWrEn || wRdEn) ? 1'b0 : 1'b1;
+assign oWrn    = (wWrEn && !wRdEn) ? 1'b0 : 1'b1;</code></pre>
             </div>
             <p>
               Lab3-2에서는 APB가 단순 register access를 넘어 하드웨어 연산 command interface가 된다.
@@ -149,6 +180,24 @@ wRdAddr = PADDR[3:2]</code></pre>
               입력 data는 InBuf 영역에 write하고, 변환 결과는 OutBuf 영역에서 read한다. Lab4는 여기에 interrupt enable, pending, mask 개념을 붙여
               hardware가 작업 완료를 software에게 알리는 흐름까지 확장한다.
             </p>
+            <div class="rtl-card">
+              <span>Lab3_2_ApbIfBlk.v - command register와 buffer 영역 분리</span>
+              <pre><code>assign wWrEn_InBuf   = (wWrEn && iPaddr[15:11] == 5'b01000) ? 1'b1 : 1'b0;
+assign wWrAddr_InBuf = iPaddr[10:2];
+
+assign wStDtCp = (wWrEn && iPaddr[15:0] == 16'h0000
+                && iPwdata[0] == 1'b1) ? 1'b1 : 1'b0;
+
+assign wRdEn_OutBuf   = (wRdEn && iPaddr[15:11] == 5'b01100) ? 1'b1 : 1'b0;
+assign wRdAddr_OutBuf = iPaddr[10:2];</code></pre>
+            </div>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - APB to SP-SRAM timing conversion</div>
+              <img src="assets/soongsil-pdf-apb-lab3-sram-timing.png" alt="APB to SP-SRAM timing conversion diagram from lecture slide" />
+              <figcaption>
+                APB transfer의 주소/data/control이 SRAM의 chip select, write enable, address, read data timing으로 바뀌는 과정을 정리한 슬라이드다.
+              </figcaption>
+            </figure>
           </section>
 
           <section class="doc-section searchable-section" id="waveforms" data-search-title="APB 검증">

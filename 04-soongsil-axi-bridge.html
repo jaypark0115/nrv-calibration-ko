@@ -34,6 +34,34 @@
             </span>
           </div>
 
+          <section class="doc-section searchable-section" id="rtl-basics" data-search-title="RTL을 읽는 기본 기준">
+            <h3>RTL을 읽는 기본 기준</h3>
+            <p>
+              이 글에서 말하는 RTL은 “하드웨어가 매 clock마다 어떤 값을 저장하고, 어떤 조합논리로 다음 신호를 만들지”를 Verilog로 적은 설계입니다.
+              C 코드처럼 위에서 아래로 한 줄씩 실행되는 프로그램이 아니라, 합성 후 register, mux, comparator, FSM, 배선으로 바뀌는 회로 설명입니다.
+              그래서 bus RTL을 읽을 때는 신호 이름보다 먼저 “어떤 신호가 register에 저장되는가”, “어떤 조건에서 handshake가 성립하는가”,
+              “주소가 어떤 register나 memory로 decode되는가”를 봐야 합니다.
+            </p>
+            <div class="definition-grid">
+              <article>
+                <h4>조합논리</h4>
+                <p><code>assign</code>이나 <code>always @(*)</code>로 만든 즉시 계산 회로입니다. 주소 비교, mux, enable 생성이 여기에 해당합니다.</p>
+              </article>
+              <article>
+                <h4>순차논리</h4>
+                <p><code>always @(posedge clk)</code>에서 clock마다 값을 저장하는 회로입니다. address latch, data register, state register가 여기에 해당합니다.</p>
+              </article>
+              <article>
+                <h4>Handshake</h4>
+                <p>보내는 쪽과 받는 쪽이 같은 cycle에 동의해야 transfer가 완료되는 규칙입니다. AXI의 VALID/READY, AHB/APB의 READY가 핵심입니다.</p>
+              </article>
+              <article>
+                <h4>FSM</h4>
+                <p>복잡한 protocol을 상태별로 쪼갠 구조입니다. Bridge에서는 AXI address/data/response와 APB setup/enable을 state로 맞췄습니다.</p>
+              </article>
+            </div>
+          </section>
+
           <div class="hardware-card-grid">
             <a class="project-card project-card-compact" href="04-apb-bus.html">
               <span class="project-thumb">APB</span>

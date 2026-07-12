@@ -54,9 +54,25 @@
               따라서 bridge RTL의 핵심은 “AXI handshake를 언제 완료로 볼 것인가”와 “APB transfer를 어느 state에서 만들 것인가”를 FSM으로 정하는 것이다.
             </p>
             <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - AXI-to-APB project block diagram</div>
+              <img src="assets/soongsil-pdf-bridge-block.png" alt="AXI to APB project block diagram from lecture slide" />
+              <figcaption>
+                <code>Axi2Apb.v</code>가 AXI slave interface를 받고 APB master 신호를 생성하며,
+                <code>ApbSlave.v</code>는 4개 register를 가진 APB target으로 동작한다. Testbench는 AXI master처럼 VALID/READY를 발생시켜 전체 경로를 검증한다.
+              </figcaption>
+            </figure>
+            <figure class="doc-figure wide-figure">
               <div class="figure-label">강의 필기 - AXI-to-APB FSM 정리</div>
               <img src="assets/soongsil-fsm-whiteboard.jpg" alt="AXI-to-APB Bridge FSM 필기 사진" />
               <figcaption>write path와 read path를 분리해 AXI handshake와 APB setup-enable phase를 연결하는 FSM을 먼저 정리했다.</figcaption>
+            </figure>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - Write/Read FSM</div>
+              <img src="assets/soongsil-pdf-bridge-fsm.png" alt="AXI to APB bridge write and read FSM from lecture slide" />
+              <figcaption>
+                write FSM은 AW, W, APB setup, APB enable, B response로 이어지고,
+                read FSM은 AR, APB setup, APB enable, R response로 이어진다. 최종 RTL도 이 구조를 기준으로 작성했다.
+              </figcaption>
             </figure>
           </section>
 
@@ -99,15 +115,32 @@
               <li><strong>xW_BValid:</strong> APB write가 끝난 뒤 BVALID/BRESP를 반환하고 BREADY handshake로 write transaction을 닫는다.</li>
             </ol>
             <div class="rtl-card">
-              <span>Axi2Apb.v - write FSM 핵심 상태</span>
-              <pre><code>xW_Idle
-  → xW_AwReady   // AW handshake
-  → xW_WValid    // W handshake
-  → xW_Setup     // APB setup: PSEL=1, PENABLE=0
-  → xW_Enable    // APB enable: PENABLE=1, wait PREADY
-  → xW_BValid    // AXI B response
-  → xW_Idle</code></pre>
+              <span>Axi2Apb.v - write FSM state와 next-state 코드</span>
+              <pre><code>localparam [2:0]
+  xW_Idle    = 3'd0,
+  xW_AwReady = 3'd1,
+  xW_WValid  = 3'd2,
+  xW_Setup   = 3'd3,
+  xW_Enable  = 3'd4,
+  xW_BValid  = 3'd5;
+
+case (rWrCurState)
+  xW_Idle:    rWrNxtState = xW_AwReady;
+  xW_AwReady: if (wAwFire) rWrNxtState = xW_WValid;
+  xW_WValid:  if (wWFire)  rWrNxtState = xW_Setup;
+  xW_Setup:   rWrNxtState = xW_Enable;
+  xW_Enable:  if (iPREADY) rWrNxtState = xW_BValid;
+  xW_BValid:  if (wBFire)  rWrNxtState = xW_Idle;
+endcase</code></pre>
             </div>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - AXI write가 APB write로 바뀌는 시간 순서</div>
+              <img src="assets/soongsil-pdf-bridge-write-timing.png" alt="AXI to APB bridge write timing from lecture slide" />
+              <figcaption>
+                AWVALID/AWREADY로 주소를 받고, WVALID/WREADY로 data를 받은 뒤, APB setup-enable을 만들고 PREADY 이후 BVALID/BRESP를 반환한다.
+                아래 파형에서 <code>rWrCurState</code>가 이 순서대로 이동한다.
+              </figcaption>
+            </figure>
           </section>
 
           <section class="doc-section searchable-section" id="read-fsm" data-search-title="read FSM">
@@ -126,14 +159,30 @@
               <li><strong>R handshake:</strong> master가 RREADY를 올리면 read transaction을 닫고 idle로 돌아간다.</li>
             </ol>
             <div class="rtl-card">
-              <span>Axi2Apb.v - read FSM 핵심 상태</span>
-              <pre><code>xR_Idle
-  → xR_ArReady   // AR handshake
-  → xR_Setup     // APB read setup
-  → xR_Enable    // APB read enable, wait PREADY
-  → xR_RValid    // AXI RDATA/RRESP/RLAST 반환
-  → xR_Idle</code></pre>
+              <span>Axi2Apb.v - read FSM state와 next-state 코드</span>
+              <pre><code>localparam [2:0]
+  xR_Idle    = 3'd0,
+  xR_ArReady = 3'd1,
+  xR_Setup   = 3'd2,
+  xR_Enable  = 3'd3,
+  xR_RValid  = 3'd4;
+
+case (rRdCurState)
+  xR_Idle:    rRdNxtState = xR_ArReady;
+  xR_ArReady: if (wArFire) rRdNxtState = xR_Setup;
+  xR_Setup:   rRdNxtState = xR_Enable;
+  xR_Enable:  if (iPREADY) rRdNxtState = xR_RValid;
+  xR_RValid:  if (wRFire)  rRdNxtState = xR_Idle;
+endcase</code></pre>
             </div>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">수업자료 - AXI read가 APB read로 바뀌는 시간 순서</div>
+              <img src="assets/soongsil-pdf-bridge-read-timing.png" alt="AXI to APB bridge read timing from lecture slide" />
+              <figcaption>
+                ARVALID/ARREADY로 주소를 받고, APB read setup-enable을 만든 뒤, PRDATA를 latch해 AXI RDATA/RVALID/RLAST로 반환한다.
+                RVALID은 master가 RREADY를 줄 때까지 유지된다.
+              </figcaption>
+            </figure>
           </section>
 
           <section class="doc-section searchable-section" id="ready-pulse" data-search-title="READY pulse 구현">
@@ -144,10 +193,38 @@
               <code>ARREADY</code>는 ARVALID의 2번째 cycle에 pulse로 올라오도록 했다. testbench도 이 timing에 맞춰 VALID를 유지한다.
             </p>
             <div class="rtl-card">
-              <span>Axi2Apb.v - READY pulse 조건</span>
-              <pre><code>wAwReadyPulse = (state == xW_AwReady) & AWVALID & (AWVALID count == 2nd cycle)
-wWReadyPulse  = (state == xW_WValid ) & WVALID  & (WVALID  count == 3rd cycle)
-wArReadyPulse = (state == xR_ArReady) & ARVALID & (ARVALID count == 2nd cycle)</code></pre>
+              <span>Axi2Apb.v - READY pulse를 실제로 만든 코드</span>
+              <pre><code>wire wAwReadyPulse = (rWrCurState == xW_AwReady)
+                   && iS_AwValid && (rAwVcnt == 2'd1); // 2nd AWVALID
+wire wWReadyPulse  = (rWrCurState == xW_WValid)
+                   && iS_WValid  && (rWVcnt  == 2'd2); // 3rd WVALID
+wire wArReadyPulse = (rRdCurState == xR_ArReady)
+                   && iS_ArValid && (rArVcnt == 2'd1); // 2nd ARVALID
+
+wire wAwFire = iS_AwValid && oS_AwReady;
+wire wWFire  = iS_WValid  && oS_WReady;
+wire wArFire = iS_ArValid && oS_ArReady;</code></pre>
+            </div>
+            <p>
+              여기서 counter를 둔 이유는 testbench가 일부러 VALID를 여러 cycle 유지하는 조건을 만들었기 때문이다.
+              bridge가 VALID를 보는 즉시 READY를 내는 것이 아니라, 정해진 cycle에 READY pulse를 내도록 하여 write/read timing diagram과 파형을 맞췄다.
+              이 구조 덕분에 master delay가 있는 상황에서도 handshake가 한 cycle pulse로 명확하게 보인다.
+            </p>
+            <div class="rtl-card">
+              <span>Axi2Apb.v - APB output logic</span>
+              <pre><code>if (rWrCurState == xW_Setup) begin
+  oPSEL    = 1'b1;
+  oPENABLE = 1'b0;
+  oPWRITE  = 1'b1;
+  oPADDR   = rWrAddr[15:0];
+  oPWDATA  = rWrData;
+end else if (rWrCurState == xW_Enable) begin
+  oPSEL    = 1'b1;
+  oPENABLE = 1'b1;
+  oPWRITE  = 1'b1;
+  oPADDR   = rWrAddr[15:0];
+  oPWDATA  = rWrData;
+end</code></pre>
             </div>
             <p>
               <code>ApbSlave.v</code>는 APB transfer 완료를 <code>PSEL & PENABLE & PREADY</code>로 본다.
@@ -156,17 +233,27 @@ wArReadyPulse = (state == xR_ArReady) & ARVALID & (ARVALID count == 2nd cycle)</
             </p>
             <div class="rtl-card">
               <span>ApbSlave.v - write commit과 read mux</span>
-              <pre><code>wSetup  = PSEL & ~PENABLE
-wEnable = PSEL &  PENABLE
+              <pre><code>wire wSetup  = iPSEL & ~iPENABLE;
+wire wEnable = iPSEL &  iPENABLE;
 
-if (wEnable && PWRITE && PREADY)
-  case (PADDR[5:2])
-    0: rA <= PWDATA
-    1: rB <= PWDATA
-    2: rC <= PWDATA
-    3: rD <= PWDATA
+if (wEnable && iPWRITE && oPREADY) begin
+  case (iPADDR[5:2])
+    4'h0: rA <= iPWDATA;
+    4'h1: rB <= iPWDATA;
+    4'h2: rC <= iPWDATA;
+    4'h3: rD <= iPWDATA;
+  endcase
+end
 
-PRDATA = register selected by PADDR[5:2]</code></pre>
+always @(*) begin
+  case (iPADDR[5:2])
+    4'h0: oPRDATA = rA;
+    4'h1: oPRDATA = rB;
+    4'h2: oPRDATA = rC;
+    4'h3: oPRDATA = rD;
+    default: oPRDATA = 32'h0;
+  endcase
+end</code></pre>
             </div>
           </section>
 
@@ -182,6 +269,20 @@ PRDATA = register selected by PADDR[5:2]</code></pre>
               handshake가 빠지거나 response가 맞지 않거나 readback 값이 틀리면 error를 출력하고,
               모든 조건이 맞으면 최종적으로 <code>PASS: 4REG write/read + timing OK</code>를 출력한다.
             </p>
+            <div class="rtl-card">
+              <span>TbTop_Prj_Axi.v - AXI master 역할을 task로 만든 부분</span>
+              <pre><code>// write task: AWVALID 2 cycles, WVALID/WLAST/WDATA 3 cycles
+axi_write_shape(32'h7000_0000, 32'h7000_0000, 2, 2);
+axi_write_shape(32'h7000_0004, 32'h7000_0004, 2, 2);
+axi_write_shape(32'h7000_0008, 32'h7000_0008, 2, 2);
+axi_write_shape(32'h7000_000C, 32'h7000_000C, 2, 2);
+
+// read task: ARVALID 2 cycles, RVALID 확인 후 RREADY pulse
+axi_read_shape(32'h7000_0000, rd, 2, 2);
+if (rd !== 32'h7000_0000) $finish;
+
+$display("[%0t] PASS: 4REG write/read + timing OK", $time);</code></pre>
+            </div>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AXI write 요청이 APB write transfer로 변환되는 파형</div>
               <img src="assets/soongsil-axi-write-waveform.png" alt="AXI write channel과 APB write transfer 신호가 함께 표시된 SimVision 파형" />
