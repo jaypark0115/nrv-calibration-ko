@@ -23,9 +23,8 @@
           <h1>SoC/FPGA Bus 학습 노트</h1>
           <p class="lead">
             이 노트는 숭실대학교 차세대반도체학과 동계 학부생연구인턴에서 진행한 APB, AHB, AXI,
-            AXI-to-APB Bridge 실습을 정리한 글입니다. 단순히 bus 이름을 설명하는 페이지가 아니라,
-            수업자료의 register map과 Lab 코드, SimVision 파형, 최종 프로젝트 로그를 기준으로
-            내가 어떤 순서로 이해했고 어떤 부분을 직접 확인했는지 남겼습니다.
+            AXI-to-APB Bridge 실습을 위키형으로 정리한 글입니다. bus가 실제 회로에서 무엇을 의미하는지부터
+            각 protocol의 신호, transfer 순서, Lab RTL 구현, SimVision 파형, 최종 프로젝트 로그까지 한 흐름으로 설명합니다.
           </p>
           <div class="scope-note">
             <strong>읽는 순서</strong>
@@ -62,10 +61,8 @@
             <h3>수업자료 기준 Lab 진행 흐름</h3>
             <p>
               전체 과정은 APB register 실습에서 시작해 SRAM과 interrupt로 확장되고, AHB의 phase 구조,
-              AXI의 channel 구조, 최종 AXI-to-APB protocol conversion으로 이어졌다. 이 순서가 중요하다.
-              APB를 먼저 해 봐야 register map과 setup/enable을 알 수 있고, AHB를 거치며 phase와 wait-state를 이해한 뒤,
-              AXI에서 channel별 handshake를 분리해서 볼 수 있었다. 최종 프로젝트는 이 세 가지를 한 번에 묶어
-              AXI 요청을 APB register 접근으로 바꾼 작업이었다.
+              AXI의 channel 구조, 최종 AXI-to-APB protocol conversion으로 이어진다. 각 페이지는 단순 활동 기록이 아니라
+              “개념 정의 → 신호 설명 → RTL 구현 → 검증” 순서로 읽히도록 구성했다.
             </p>
             <div class="lab-timeline">
               <article>

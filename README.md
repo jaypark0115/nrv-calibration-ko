@@ -5,7 +5,7 @@
 
 NRV DVS 캘리브레이션 글은 이벤트 카메라에 맞는 캘리브레이션 조건과 촬영 흐름을 직접 찾아보고 정리한 자료입니다.
 숭실대 SoC/FPGA Bus 글은 동계 학부생연구인턴에서 다룬 APB, AHB, AXI, AXI-to-APB Bridge 실습을
-강의자료, Lab 코드, SimVision 파형, 최종 RTL 검증 결과 기준으로 다시 설명한 자료입니다.
+개념 정의, 신호 설명, RTL 구현, SimVision 파형, 최종 RTL 검증 결과 기준으로 다시 설명한 위키형 자료입니다.
 
 이 저장소의 첫 화면은 개인적으로 정리한 글 목록이며, NRV 공식 문서가 아닙니다.
 NRV와 관련된 공식 정보는 NRV docs 웹페이지에서 확인해야 합니다.
@@ -40,13 +40,13 @@ https://jaypark0115.github.io/jay-tech-notes/
 1. [SoC/FPGA Bus 학습 노트 입구](https://jaypark0115.github.io/jay-tech-notes/04-soongsil-axi-bridge.html)
    - APB, AHB, AXI, AXI-to-APB Bridge 글로 들어가는 안내 페이지
 2. [APB Control Bus](https://jaypark0115.github.io/jay-tech-notes/04-apb-bus.html)
-   - APB setup/enable phase, Lab2 register block, Lab3 SRAM, Lab4 interrupt register 실습 설명
+   - 실제 bus의 의미, APB setup/enable phase, register map, Lab2~4 RTL decode와 SRAM/interrupt 실습 설명
 3. [AHB Pipelined Bus](https://jaypark0115.github.io/jay-tech-notes/05-ahb-bus.html)
-   - AHB topology, address/data phase, Lab5 register block, Lab6 SP-SRAM wait-state 검증 설명
+   - AHB topology, address/data phase, HREADY, Lab5 register block, Lab6 SP-SRAM wait-state RTL 설명
 4. [AXI Channel Bus](https://jaypark0115.github.io/jay-tech-notes/06-axi-bus.html)
-   - AXI 5개 channel, VALID/READY handshake, Lab7 AXI slave register block 설명
+   - AXI 5개 channel, VALID/READY handshake, Lab7 AXI slave register block RTL 설명
 5. [AXI-to-APB Bridge 설계와 검증](https://jaypark0115.github.io/jay-tech-notes/07-axi-to-apb-bridge.html)
-   - 최종 프로젝트의 write/read FSM, APB slave 4-register target, testbench 기반 PASS 검증 설명
+   - 최종 프로젝트의 protocol conversion, write/read FSM, APB slave, testbench 기반 PASS 검증 설명
 
 ### GitHub 프로젝트 링크
 
@@ -76,5 +76,5 @@ https://jaypark0115.github.io/jay-tech-notes/
 ## 최근 갱신
 
 - 숭실대 SoC/FPGA Bus 학습 노트를 APB, AHB, AXI, AXI-to-APB Bridge로 분리했습니다.
-- 각 페이지는 단순 개념 요약이 아니라 강의자료와 Lab 코드, 파형, 최종 프로젝트 로그를 바탕으로 직접 설명하는 글로 다시 작성했습니다.
+- 각 페이지는 단순 활동 기록이 아니라 강의자료와 Lab 코드, 파형, 최종 프로젝트 로그를 바탕으로 개념과 RTL 구현을 함께 설명하는 위키형 글로 다시 작성했습니다.
 - AXI-to-APB Bridge 최종 프로젝트는 `Axi2Apb`, `ApbSlave`, `Prj_Axi_Top`, `TbTop_Prj_Axi`와 최종 `PASS: 4REG write/read + timing OK` 로그 기준으로 정리했습니다.
