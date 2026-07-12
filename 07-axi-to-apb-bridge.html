@@ -54,25 +54,16 @@
               따라서 bridge RTL의 핵심은 “AXI handshake를 언제 완료로 볼 것인가”와 “APB transfer를 어느 state에서 만들 것인가”를 FSM으로 정하는 것이다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AXI-to-APB project block diagram</div>
-              <img src="assets/soongsil-pdf-bridge-block.png" alt="AXI to APB project block diagram from lecture slide" />
-              <figcaption>
-                <code>Axi2Apb.v</code>가 AXI slave interface를 받고 APB master 신호를 생성하며,
-                <code>ApbSlave.v</code>는 4개 register를 가진 APB target으로 동작한다. Testbench는 AXI master처럼 VALID/READY를 발생시켜 전체 경로를 검증한다.
-              </figcaption>
+              <div class="figure-label">AXI-to-APB bridge block</div>
+              <img src="assets/soongsil-pdf-bridge-block.png" alt="AXI-to-APB bridge block" />
             </figure>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">강의 필기 - AXI-to-APB FSM 정리</div>
-              <img src="assets/soongsil-fsm-whiteboard.jpg" alt="AXI-to-APB Bridge FSM 필기 사진" />
-              <figcaption>write path와 read path를 분리해 AXI handshake와 APB setup-enable phase를 연결하는 FSM을 먼저 정리했다.</figcaption>
+              <div class="figure-label">Write FSM / Read FSM</div>
+              <img src="assets/soongsil-fsm-whiteboard.jpg" alt="Write FSM / Read FSM" />
             </figure>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Write/Read FSM</div>
-              <img src="assets/soongsil-pdf-bridge-fsm.png" alt="AXI to APB bridge write and read FSM from lecture slide" />
-              <figcaption>
-                write FSM은 AW, W, APB setup, APB enable, B response로 이어지고,
-                read FSM은 AR, APB setup, APB enable, R response로 이어진다. 최종 RTL도 이 구조를 기준으로 작성했다.
-              </figcaption>
+              <div class="figure-label">Write FSM / Read FSM</div>
+              <img src="assets/soongsil-pdf-bridge-fsm.png" alt="Write FSM / Read FSM" />
             </figure>
           </section>
 
@@ -134,12 +125,8 @@ case (rWrCurState)
 endcase</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AXI write가 APB write로 바뀌는 시간 순서</div>
-              <img src="assets/soongsil-pdf-bridge-write-timing.png" alt="AXI to APB bridge write timing from lecture slide" />
-              <figcaption>
-                AWVALID/AWREADY로 주소를 받고, WVALID/WREADY로 data를 받은 뒤, APB setup-enable을 만들고 PREADY 이후 BVALID/BRESP를 반환한다.
-                아래 파형에서 <code>rWrCurState</code>가 이 순서대로 이동한다.
-              </figcaption>
+              <div class="figure-label">AXI write to APB write timing</div>
+              <img src="assets/soongsil-pdf-bridge-write-timing.png" alt="AXI write to APB write timing" />
             </figure>
           </section>
 
@@ -176,12 +163,8 @@ case (rRdCurState)
 endcase</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AXI read가 APB read로 바뀌는 시간 순서</div>
-              <img src="assets/soongsil-pdf-bridge-read-timing.png" alt="AXI to APB bridge read timing from lecture slide" />
-              <figcaption>
-                ARVALID/ARREADY로 주소를 받고, APB read setup-enable을 만든 뒤, PRDATA를 latch해 AXI RDATA/RVALID/RLAST로 반환한다.
-                RVALID은 master가 RREADY를 줄 때까지 유지된다.
-              </figcaption>
+              <div class="figure-label">AXI read to APB read timing</div>
+              <img src="assets/soongsil-pdf-bridge-read-timing.png" alt="AXI read to APB read timing" />
             </figure>
           </section>
 

@@ -80,17 +80,13 @@
               그래서 APB에는 AXI처럼 여러 독립 channel이나 outstanding transaction이 없다. 대신 setup phase와 enable phase라는 두 단계로 transfer를 명확하게 닫는다.
             </p>
             <p>
-              숭실대 수업자료의 Lab2는 APB를 가장 작은 형태로 보여 준다. 입력 register A/B를 write하고 출력 register C를 read하는 구조다.
+              Lab2에서는 APB register access를 가장 작은 형태로 다뤘다. 입력 register A/B를 write하고 출력 register C를 read하는 구조다.
               Lab3에서는 같은 APB 접근을 SRAM으로 확장했고, Lab4에서는 interrupt 관련 register까지 붙였다.
               즉 APB는 “register 하나 읽고 쓰는 버스”에서 시작하지만, 실제로는 하드웨어 연산 시작, buffer 접근, interrupt 상태 관리까지 담당할 수 있다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab2 APB register block diagram</div>
-              <img src="assets/soongsil-pdf-apb-lab2-block.png" alt="Lab2 APB interface and register block diagram from lecture slide" />
-              <figcaption>
-                APB interface block이 외부 bus 신호를 받아 내부 register write enable, write data, read enable, read data로 바꾼다.
-                오른쪽 function block은 입력 A/B를 받아 조합논리와 register를 거쳐 출력 C를 만든다.
-              </figcaption>
+              <div class="figure-label">Lab2 APB register block</div>
+              <img src="assets/soongsil-pdf-apb-lab2-block.png" alt="Lab2 APB register block" />
             </figure>
             <div class="signal-table-wrap">
               <table class="signal-table">
@@ -123,12 +119,8 @@
               <li><strong>Ready:</strong> PREADY=1이면 해당 transfer가 완료된다. PREADY=0이면 enable phase가 유지되어 wait가 걸린다.</li>
             </ol>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - APB setup/enable timing</div>
-              <img src="assets/soongsil-pdf-apb-lab2-timing.png" alt="APB setup and enable timing diagram from lecture slide" />
-              <figcaption>
-                강의 타이밍도에서는 write/read 주소와 data가 먼저 안정되고, 다음 phase에서 APB transfer가 완료되는 흐름을 보여 준다.
-                실제 RTL을 읽을 때는 <code>PSEL</code>, <code>PENABLE</code>, <code>PWRITE</code>, <code>PADDR</code> 조합이 어느 clock에 내부 enable로 바뀌는지를 함께 확인해야 한다.
-              </figcaption>
+              <div class="figure-label">APB setup/enable timing</div>
+              <img src="assets/soongsil-pdf-apb-lab2-timing.png" alt="APB setup/enable timing" />
             </figure>
           </section>
 
@@ -157,11 +149,8 @@ assign oPready  = (iPsel == 1'b1 && iPenable == 1'b1) ? 1'b1 : 1'b0;</code></pre
               software 입장에서는 주소에 write/read할 뿐이지만, hardware 내부에서는 그 주소가 SRAM chip select, write enable, address, write data로 바뀐다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab3-1 APB to SP-SRAM 구조</div>
-              <img src="assets/soongsil-pdf-apb-lab3-sram.png" alt="Lab3-1 APB to SP-SRAM lecture slide" />
-              <figcaption>
-                APB 주소 0x4000부터 0x400C까지를 4-depth SRAM entry로 보고, APB bus access를 SRAM chip select, write/read, word address, data 신호로 변환한다.
-              </figcaption>
+              <div class="figure-label">Lab3-1 APB to SP-SRAM</div>
+              <img src="assets/soongsil-pdf-apb-lab3-sram.png" alt="Lab3-1 APB to SP-SRAM" />
             </figure>
             <div class="rtl-card">
               <span>Lab3_1_ApbIfBlk.v - APB 주소를 SRAM 제어 신호로 변환</span>
@@ -192,11 +181,8 @@ assign wRdEn_OutBuf   = (wRdEn && iPaddr[15:11] == 5'b01100) ? 1'b1 : 1'b0;
 assign wRdAddr_OutBuf = iPaddr[10:2];</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - APB to SP-SRAM timing conversion</div>
-              <img src="assets/soongsil-pdf-apb-lab3-sram-timing.png" alt="APB to SP-SRAM timing conversion diagram from lecture slide" />
-              <figcaption>
-                APB transfer의 주소/data/control이 SRAM의 chip select, write enable, address, read data timing으로 바뀌는 과정을 정리한 슬라이드다.
-              </figcaption>
+              <div class="figure-label">APB to SP-SRAM timing</div>
+              <img src="assets/soongsil-pdf-apb-lab3-sram-timing.png" alt="APB to SP-SRAM timing" />
             </figure>
           </section>
 

@@ -53,20 +53,12 @@
               “주소를 받았는가”, “data를 받았는가”, “응답을 돌려줬는가”를 같은 cycle에서 보지 않고 channel별로 나누어 봐야 한다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AXI bus topology</div>
-              <img src="assets/soongsil-pdf-axi-soc-topology.png" alt="AXI bus topology lecture slide" />
-              <figcaption>
-                AXI master가 bus matrix를 통해 memory controller, internal RAM, AXI2APB bridge 같은 slave에 접근하고,
-                bridge 뒤에 APB peripheral이 붙는 구조다. 최종 프로젝트의 AXI-to-APB bridge가 이 위치에 해당한다.
-              </figcaption>
+              <div class="figure-label">AXI bus topology</div>
+              <img src="assets/soongsil-pdf-axi-soc-topology.png" alt="AXI bus topology" />
             </figure>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AHB와 AXI의 구조 차이</div>
-              <img src="assets/soongsil-pdf-ahb-vs-axi-table.png" alt="Lecture slide comparing AHB and AXI features" />
-              <figcaption>
-                AHB는 shared bus와 HREADY/HRESP 중심이고, AXI는 5개 channel과 VALID/READY handshake 중심이다.
-                이 차이 때문에 AXI RTL에서는 channel별 상태를 분리해서 봐야 한다.
-              </figcaption>
+              <div class="figure-label">AHB / AXI comparison</div>
+              <img src="assets/soongsil-pdf-ahb-vs-axi-table.png" alt="AHB / AXI comparison" />
             </figure>
           </section>
 
@@ -87,11 +79,8 @@
               </table>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - AXI independent channels</div>
-              <img src="assets/soongsil-pdf-axi-independent-channels.png" alt="AXI read address and read data channel separation from lecture slide" />
-              <figcaption>
-                AXI는 address/control channel과 data channel을 분리한다. read에서는 AR channel이 먼저 주소를 보내고, R channel이 별도로 read data beat를 반환한다.
-              </figcaption>
+              <div class="figure-label">AXI independent channels</div>
+              <img src="assets/soongsil-pdf-axi-independent-channels.png" alt="AXI independent channels" />
             </figure>
           </section>
 
@@ -126,12 +115,8 @@
               내부 function은 A+B 결과를 출력 C로 만드는 단순한 연산이지만, 이 Lab의 핵심은 add가 아니라 AXI channel을 통해 register access를 처리하는 방법이다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab7 AXI register block diagram</div>
-              <img src="assets/soongsil-pdf-axi-lab7-block.png" alt="Lab7 AXI register block diagram from lecture slide" />
-              <figcaption>
-                AXI slave interface block이 AW/W/B와 AR/R channel을 받아 내부 register A/B/C 접근으로 바꾼다.
-                기능 블록은 단순하지만, bus interface 쪽에서는 channel handshake와 response를 모두 처리해야 한다.
-              </figcaption>
+              <div class="figure-label">Lab7 AXI register block</div>
+              <img src="assets/soongsil-pdf-axi-lab7-block.png" alt="Lab7 AXI register block" />
             </figure>
             <p>
               write에서는 AW handshake로 주소를 저장하고, W handshake에서 들어온 WDATA를 저장된 주소에 맞는 register에 기록한다.
@@ -173,12 +158,8 @@ if (rRdActive && !oS_RValid) begin
 end</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab7 AXI timing</div>
-              <img src="assets/soongsil-pdf-axi-lab7-timing.png" alt="Lab7 AXI register access timing diagram from lecture slide" />
-              <figcaption>
-                write에서는 AW, W, B channel이 순서대로 닫히고, read에서는 AR, R channel이 닫힌다.
-                실제 RTL의 <code>wAwFire</code>, <code>wWFire</code>, <code>wArFire</code>, <code>wRFire</code> 조건이 이 타이밍을 검증하는 기준이다.
-              </figcaption>
+              <div class="figure-label">Lab7 AXI timing</div>
+              <img src="assets/soongsil-pdf-axi-lab7-timing.png" alt="Lab7 AXI timing" />
             </figure>
           </section>
 

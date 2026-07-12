@@ -54,24 +54,12 @@
               이 구조가 AHB를 pipeline bus처럼 보이게 만든다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - SoC bus topology</div>
-              <img src="assets/soongsil-pdf-ahb-soc-topology.png" alt="SoC bus topology lecture slide showing masters, bus matrix, AXI/AHB slaves, AXI2APB bridge, and APB slaves" />
-              <figcaption>
-                CPU, GPU/NPU, HW block 같은 master가 bus matrix를 통해 memory controller, internal RAM, AXI2APB bridge에 접근하고,
-                bridge 뒤에는 UART, I2C 같은 APB peripheral이 붙는 구조다.
-              </figcaption>
+              <div class="figure-label">SoC bus topology</div>
+              <img src="assets/soongsil-pdf-ahb-soc-topology.png" alt="SoC bus topology" />
             </figure>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - APB/AHB/AXI protocol 비교</div>
-              <img src="assets/soongsil-pdf-bus-protocol-summary.png" alt="Lecture slide comparing APB, AHB, AXI bus interface protocols" />
-              <figcaption>
-                수업자료는 APB를 간단한 peripheral control bus, AHB를 address/data phase가 중첩되는 data bus, AXI를 독립 channel 기반 고성능 bus로 구분한다.
-              </figcaption>
-            </figure>
-            <figure class="doc-figure wide-figure">
-              <div class="figure-label">강의 필기 - AHB와 AXI 사용 조건 비교</div>
-              <img src="assets/soongsil-lecture-ahb-vs-axi.jpg" alt="강의 중 정리한 AHB와 AXI 비교 필기" />
-              <figcaption>AHB는 단순성과 검증 용이성을 유지하면서 APB보다 빠른 내부 bus 구조를 보여 주고, AXI는 더 높은 성능과 확장성을 위해 channel을 분리한다.</figcaption>
+              <div class="figure-label">AHB / AXI 사용 기준 필기</div>
+              <img src="assets/soongsil-lecture-ahb-vs-axi.jpg" alt="AHB와 AXI 사용 기준을 정리한 필기" />
             </figure>
           </section>
 
@@ -119,11 +107,8 @@
               data phase에서 그 값을 기준으로 register access를 만든다는 점이다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab5 AHB register block diagram</div>
-              <img src="assets/soongsil-pdf-ahb-lab5-block.png" alt="Lab5 AHB register block diagram from lecture slide" />
-              <figcaption>
-                APB Lab2와 기능은 비슷하지만 interface가 AHB로 바뀌면서 <code>HSEL</code>, <code>HTRANS</code>, <code>HWRITE</code>, <code>HADDR</code>, <code>HREADY</code>를 기준으로 내부 register 접근을 만든다.
-              </figcaption>
+              <div class="figure-label">Lab5 AHB register block</div>
+              <img src="assets/soongsil-pdf-ahb-lab5-block.png" alt="Lab5 AHB register block" />
             </figure>
             <div class="rtl-card">
               <span>Lab5_AhbIfBlk.v - address phase latch와 register decode</span>
@@ -153,12 +138,8 @@ assign wRdSelOutC = rHSEL & valid_transfer & ~rHWRITE
               즉 register block 자체는 단순하지만, APB와 달리 phase latch를 넣어야 한다는 점이 핵심이다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab5 AHB timing</div>
-              <img src="assets/soongsil-pdf-ahb-lab5-timing.png" alt="Lab5 AHB register timing diagram from lecture slide" />
-              <figcaption>
-                HADDR와 HWRITE가 address phase에 나오고, 다음 data phase에서 HWDATA write 또는 HRDATA read가 일어난다.
-                이 때문에 RTL에서는 address/control을 한 cycle 저장해 data phase에서 사용한다.
-              </figcaption>
+              <div class="figure-label">Lab5 AHB timing</div>
+              <img src="assets/soongsil-pdf-ahb-lab5-timing.png" alt="Lab5 AHB timing" />
             </figure>
           </section>
 
@@ -189,11 +170,8 @@ always @(posedge iClk) begin
 end</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">수업자료 - Lab6 AHB to SP-SRAM timing</div>
-              <img src="assets/soongsil-pdf-ahb-lab6-sram-timing.png" alt="Lab6 AHB to SP-SRAM timing conversion from lecture slide" />
-              <figcaption>
-                synchronous SRAM read는 address를 넣은 cycle과 data가 나오는 cycle이 다르기 때문에, AHB read path에서 <code>HREADY</code>를 한 cycle 낮추는 이유를 보여 준다.
-              </figcaption>
+              <div class="figure-label">Lab6 AHB to SP-SRAM timing</div>
+              <img src="assets/soongsil-pdf-ahb-lab6-sram-timing.png" alt="Lab6 AHB to SP-SRAM timing" />
             </figure>
           </section>
 
