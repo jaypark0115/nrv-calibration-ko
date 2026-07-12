@@ -149,8 +149,12 @@ assign oPready  = (iPsel == 1'b1 && iPenable == 1'b1) ? 1'b1 : 1'b0;</code></pre
               software 입장에서는 주소에 write/read할 뿐이지만, hardware 내부에서는 그 주소가 SRAM chip select, write enable, address, write data로 바뀐다.
             </p>
             <figure class="doc-figure wide-figure">
-              <div class="figure-label">Lab3-1 APB to SP-SRAM</div>
-              <img src="assets/soongsil-pdf-apb-lab3-sram.png" alt="Lab3-1 APB to SP-SRAM" />
+              <div class="figure-label">Lab3-1 register map</div>
+              <img src="assets/soongsil-pdf-apb-lab3-register-map.png" alt="Lab3-1 register map" />
+            </figure>
+            <figure class="doc-figure wide-figure">
+              <div class="figure-label">Lab3-1 APB-to-SRAM block</div>
+              <img src="assets/soongsil-pdf-apb-lab3-block.png" alt="Lab3-1 APB-to-SRAM block" />
             </figure>
             <div class="rtl-card">
               <span>Lab3_1_ApbIfBlk.v - APB 주소를 SRAM 제어 신호로 변환</span>
