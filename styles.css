@@ -2336,3 +2336,53 @@ body.home-page .sitemap-number {
 .sequence-list strong {
   color: var(--ink);
 }
+
+/* The personal GitHub-project collection stays compact on desktop. */
+#github-projects .project-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+#github-projects .project-card {
+  min-height: 0;
+  padding-bottom: 20px;
+}
+
+#github-projects .project-thumb {
+  aspect-ratio: 4 / 3;
+}
+
+#github-projects .project-card .sitemap-number {
+  width: 44px;
+  height: 44px;
+  margin: 18px 20px 12px;
+  font-size: 0.82rem;
+}
+
+#github-projects .project-card small {
+  margin: 0 20px 8px;
+  font-size: 0.66rem;
+}
+
+#github-projects .project-card h2 {
+  margin: 0 20px 10px;
+  font-size: 1.05rem;
+}
+
+#github-projects .project-card p {
+  margin: 0 20px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+  #github-projects .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  #github-projects .project-grid {
+    grid-template-columns: 1fr;
+  }
+}
