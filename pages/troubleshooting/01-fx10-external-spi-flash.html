@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="FX10 외부 SPI 플래시 프로그래밍이 page index 2에서 실패한 원인과 해결 과정."
+      content="FX10 외부 QSPI 플래시 기록이 page index 2에서 실패한 원인과 복구 과정."
     />
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>FX10 외부 SPI 플래시 쓰기 실패 해결 — Jay Tech Notes</title>
+    <title>FX10 외부 QSPI 플래시 복구 기록 — Jay Tech Notes</title>
     <link rel="stylesheet" href="../../styles.css" />
     <script src="../../script.js" defer></script>
   </head>
@@ -31,44 +31,35 @@
             <span class="chapter-switcher-label">트러블슈팅 글 목록</span>
             <div>
               <a class="current" href="01-fx10-external-spi-flash.html" aria-current="page">
-                1. FX10 외부 SPI 플래시 쓰기 실패
+                1. FX10 외부 QSPI 플래시 쓰기 실패
               </a>
             </div>
           </nav>
 
-          <h1>FX10 외부 SPI 플래시 쓰기 실패: page index 2 오류의 원인과 해결</h1>
+          <h1>FX10 외부 QSPI 플래시 복구: 잘못된 bitstream 뒤 정상 기록이 실패한 문제</h1>
           <p class="lead">
-            Efinity에서 만든 bitstream을 FX10 카메라 모듈의 외부 SPI 플래시에
-            기록하면 지우기는 성공하지만 세 번째 page에서 검증이 실패했습니다.
-            이 글은 host와 센서 레지스터부터 확인해 범위를 줄인 뒤, 오류가 난
-            주소를 기준으로 외부 플래시의 erase 단위를 점검하고 복구한 기록입니다.
+            잘못된 bitstream을 외부 QSPI 플래시에 기록한 뒤, 정상 bitstream을 다시 넣으려 해도
+            기록이 실패했습니다. 프로그램은 erase가 끝났다고 표시했지만, 새 데이터를 쓴 뒤
+            세 번째 page를 다시 읽어 비교하는 과정에서 실패했습니다. 이 글은 실패 위치를
+            추적해 플래시를 복구하고 정상 firmware와 bitstream을 다시 기록한 과정입니다.
           </p>
-
-          <div class="scope-note" role="note">
-            <strong>한눈에 보는 결론</strong>
-            <span>
-              실패한 <code>page index 2</code>의 시작 주소는 <code>0x1000</code>입니다.
-              이 주소가 플래시 앞부분의 4 KiB 경계와 맞물린다는 점을 확인한 뒤,
-              플래시의 erase map을 확인한 뒤 지운 상태를 검증하고, 정상 firmware와 bitstream을 다시 기록했습니다.
-            </span>
-          </div>
 
           <section class="troubleshooting-summary" aria-label="문제 요약">
             <div class="summary-row">
               <strong>증상</strong>
-              <span>82개 sector erase 성공 후 <code>page index 2</code>에서 readback mismatch</span>
+              <span>잘못된 bitstream 뒤 정상 bitstream도 <code>page index 2</code>에서 readback 실패</span>
             </div>
             <div class="summary-row">
               <strong>환경</strong>
-              <span>FX10 bootloader, EZ-USB FX Control Center, 외부 SPI NOR, Ti180 bitstream</span>
+              <span>FX10 bootloader, EZ-USB FX Control Center, 외부 QSPI NOR, Ti180 bitstream</span>
             </div>
             <div class="summary-row">
               <strong>원인</strong>
-              <span>플래시 앞부분의 4 KiB parameter sector와 64 KiB 기준 erase 계산의 불일치</span>
+              <span>현재 flash mode와 맞지 않는 erase 처리로 앞부분에 이전 데이터가 남음</span>
             </div>
             <div class="summary-row">
               <strong>해결</strong>
-              <span>erase-only helper로 chip erase와 <code>0xFF</code> 검증 후 원래 기록 절차 재실행</span>
+              <span>erase-only helper로 flash를 지우고 <code>0xFF</code>를 확인한 뒤 정상 기록 절차 재실행</span>
             </div>
             <div class="summary-row">
               <strong>결과</strong>
@@ -76,50 +67,39 @@
             </div>
           </section>
 
-          <nav class="jump-links" aria-label="이 글 바로가기">
-            <a href="#problem">문제 상황</a>
-            <a href="#failure-log">오류 로그</a>
-            <a href="#analysis">원인 분석</a>
-            <a href="#solution">해결 방법</a>
-            <a href="#verification">검증 결과</a>
-          </nav>
-
           <section class="doc-section searchable-section" id="problem" data-search-title="문제 상황">
             <h3>1. 문제 상황</h3>
             <p>
-              카메라 모듈에 bitstream을 기록하려고 하면 장치 연결, bootloader 진입,
-              외부 SPI flash programming 시작까지는 정상적으로 진행됐습니다. 도구에는
-              82개 sector를 성공적으로 지웠다고 표시됐지만, 실제 write 단계에서는
-              세 번째 page를 읽어 비교하는 순간 실패했습니다.
+              Efinity에서 만든 잘못된 bitstream을 외부 QSPI 플래시에 한 번 기록한 뒤 문제가
+              시작됐습니다. 이후 정상 bitstream을 다시 넣으려고 해도 프로그램은 erase가
+              완료됐다고 표시한 뒤 <code>page index 2</code>에서 기록을 멈췄습니다.
             </p>
             <p>
-              처음에는 FX10 host 설정부터 카메라 센서 레지스터까지 확인했습니다.
-              장치 연결과 bootloader 진입은 정상이고, host와 센서 제어도 응답하는 상태였습니다.
-              즉, 오류는 카메라 제어를 시작하기 전 단계가 아니라 외부 SPI 플래시에
-              데이터를 쓴 뒤 읽어 비교하는 단계에서 발생했습니다. 이 관찰을 기준으로
-              이후 점검은 외부 플래시의 쓰기·지우기 경로에 집중했습니다.
+              화면에는 읽기 비교 단계의 오류가 표시됐습니다. 이후 플래시 앞부분을 확인하니,
+              erase 완료 메시지와 달리 이전 bitstream 데이터가 일부 남아 있었습니다. 남아 있던
+              값 때문에 새 bitstream을 기록한 뒤 읽은 데이터가 원본과 달라졌습니다.
             </p>
 
-            <div class="debug-flow" aria-label="bitstream 기록 경로">
-              <div><span>1</span><strong>PC</strong><small>FX Control Center</small></div>
-              <b>→</b>
-              <div><span>2</span><strong>FX10</strong><small>bootloader / SPI 제어</small></div>
-              <b>→</b>
-              <div><span>3</span><strong>외부 SPI NOR</strong><small>bitstream 저장</small></div>
-              <b>→</b>
-              <div><span>4</span><strong>FPGA</strong><small>저장된 bitstream 로드</small></div>
-            </div>
-
             <figure class="doc-figure troubleshooting-figure">
-              <div class="figure-label">외부 SPI 플래시 기록 실패 화면</div>
+              <div class="figure-label">외부 QSPI 플래시 기록 실패 화면</div>
               <img
                 src="../../assets/fx10-external-flash-write-failure.png"
-                alt="page index 2에서 read buffer mismatch와 firmware download failed가 표시된 외부 SPI 플래시 기록 로그"
+                alt="page index 2에서 read buffer mismatch와 firmware download failed가 표시된 외부 QSPI 플래시 기록 로그"
               />
               <figcaption>
-                erase 단계는 완료됐지만 <code>Read buffer mismatch for page index : 2</code>가
-                발생했습니다. 실패한 page 번호와 page 크기를 이용하면, 문제가 난 플래시
-                주소를 바로 계산할 수 있습니다.
+                erase 완료 메시지 뒤에도 세 번째 page인 <code>page index 2</code>를
+                읽어 비교하는 단계에서 값이 맞지 않았습니다.
+              </figcaption>
+            </figure>
+
+            <figure class="doc-figure troubleshooting-figure hardware-reference-figure">
+              <div class="figure-label">FX10 보드의 QSPI 플래시 위치</div>
+              <img
+                src="../../assets/fx10-qspi-flash-reference.png"
+                alt="FX10 개발 보드에서 QSPI flash 위치가 표시된 상면 사진"
+              />
+              <figcaption>
+                기록 대상인 외부 QSPI 플래시 위치입니다. bitstream은 이 플래시에 저장됩니다.
               </figcaption>
             </figure>
           </section>
@@ -135,142 +115,58 @@ Failed to write into page index : 2
 Firmware download failed</code></pre>
 
             <p>
-              기록 page 한 개는 2,048 byte였습니다. page index는 0부터 시작하므로
-              세 번째 page인 index 2는 플래시의 다음 주소에서 시작합니다.
-            </p>
-            <div class="address-math" role="note">
-              <span>page 시작 주소</span>
-              <strong>2 × 2,048 byte = 4,096 byte = <code>0x1000</code></strong>
-            </div>
-            <p>
-              오류는 임의의 위치가 아니라 플래시 시작점에서 정확히 4 KiB 떨어진
-              주소에서 발생했습니다. 이처럼 특정 경계에서 반복된다는 점은 전송 파일이나
-              센서 레지스터보다 플래시의 erase 단위와 sector map을 먼저 확인해야 한다는
-              근거가 됐습니다.
+              기록 page는 2 KiB였고 index는 0부터 시작했습니다. 따라서 세 번째 page인
+              <code>page index 2</code>는 <code>0x1000</code>에서 시작합니다. 오류가 이
+              위치에서 반복된다는 점을 근거로, 기록 파일보다 플래시 앞부분이 실제로
+              지워졌는지 먼저 확인했습니다.
             </p>
           </section>
 
           <section class="doc-section searchable-section" id="analysis" data-search-title="원인 분석">
-            <h3>3. 원인을 좁힌 과정</h3>
-            <div class="diagnostic-table-wrap">
-              <table class="diagnostic-table">
-                <thead>
-                  <tr>
-                    <th>확인 항목</th>
-                    <th>확인 목적</th>
-                    <th>판단</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>bootloader와 장치 연결</td>
-                    <td>FX10이 프로그래밍 모드로 진입하는지 확인</td>
-                    <td><span class="status-chip pass">정상</span></td>
-                  </tr>
-                  <tr>
-                    <td>host·센서 레지스터</td>
-                    <td>카메라 제어 경로 전체가 끊긴 문제인지 확인</td>
-                    <td><span class="status-chip pass">주요 원인 제외</span></td>
-                  </tr>
-                  <tr>
-                    <td>외부 flash ID</td>
-                    <td>SPI 통신과 flash 응답 여부 확인</td>
-                    <td><span class="status-chip pass">응답 정상</span></td>
-                  </tr>
-                  <tr>
-                    <td>실패 주소 계산</td>
-                    <td>오류가 특정 경계에서 반복되는지 확인</td>
-                    <td><span class="status-chip focus"><code>0x1000</code></span></td>
-                  </tr>
-                  <tr>
-                    <td>chip erase 후 표본 읽기</td>
-                    <td>지우기와 실제 flash 데이터 상태 확인</td>
-                    <td><span class="status-chip pass"><code>0xFF</code>, PASS</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <h3>3. 0x1000에서 실패한 이유: sector 모드</h3>
+            <p>
+              처음에는 host와 센서 레지스터도 확인했습니다. 하지만 장치 연결과 제어는
+              정상적이었고, 외부 flash ID도 응답했습니다. 문제 범위를 외부 QSPI 플래시의
+              기록과 erase 과정으로 좁힌 이유입니다.
+            </p>
 
             <div class="root-cause-card">
               <span>근본 원인</span>
-              <h4>외부 SPI NOR의 섹터 구조와 기존 erase 계산 방식이 맞지 않았습니다.</h4>
+              <h4>flash는 hybrid mode였지만, 기존 프로그램은 uniform sector 기준으로 지우고 있었습니다.</h4>
               <p>
-                플래시 앞부분에는 4 KiB parameter sector가 배치되는 hybrid sector 구조가
-                사용됐지만, 기존 프로그래밍 흐름은 기록 영역을 64 KiB sector 기준으로
-                계산하고 지운 것으로 판단됩니다. 따라서 화면의
-                <code>Successfully erased 82 sectors</code>는 erase 명령 흐름이 완료됐다는
-                뜻일 뿐, 기록할 모든 주소가 실제로 <code>0xFF</code>가 됐다는 보장은
-                아니었습니다.
+                QSPI NOR flash에는 앞부분을 작은 4 KiB sector로 나누는 hybrid mode와,
+                전체를 64 KiB sector로 보는 uniform mode가 있습니다. 이 mode는
+                Configuration Register 3의 <code>CR3NV[3]</code> bit가 결정합니다.
+                <code>0</code>이면 hybrid mode, <code>1</code>이면 uniform mode입니다.
+              </p>
+              <p>
+                잘못된 bitstream을 기록한 뒤 flash map을 읽어 보니 이 보드는 hybrid mode로
+                동작하고 있었습니다. 그러나 기존 프로그램은 uniform mode의 지우기 단위를
+                전제로 erase를 수행하고 있었습니다. 그래서 <code>Successfully erased 82 sectors</code>가
+                표시돼도 <code>0x1000</code>이 속한 4 KiB 구간에는 이전 데이터가 남았습니다.
               </p>
             </div>
 
-            <figure class="doc-figure troubleshooting-figure hardware-reference-figure">
-              <div class="figure-label">FX10 보드의 QSPI 플래시 위치</div>
-              <img
-                src="../../assets/fx10-qspi-flash-reference.png"
-                alt="FX10 개발 보드에서 QSPI flash 위치가 표시된 상면 사진"
-              />
-              <figcaption>
-                이번에 확인한 대상은 FX10 내부 RAM이나 FPGA 주소 공간이 아니라, bitstream을
-                저장하는 보드의 외부 QSPI 플래시입니다.
-              </figcaption>
-            </figure>
-
             <p>
-              NOR 플래시는 erase 후 bit가 1, 즉 <code>0xFF</code> 상태가 됩니다.
-              program 동작은 1을 0으로 바꿀 수 있지만, 이미 0인 bit를 다시 1로
-              만들 수는 없습니다. 지워지지 않은 0이 남아 있으면 새 데이터를 쓴 뒤
-              읽은 값이 원본 buffer와 달라져 readback mismatch가 발생합니다.
-            </p>
-            <p>
-              여기서 바꿔야 했던 “메모리 공간”은 FX10 내부 RAM이나 FPGA RTL 주소 공간이
-              아닙니다. 정확히는 외부 SPI NOR 플래시의 sector/erase map을 기존 도구가
-              처리하는 방식이었습니다. 따라서 Efinity의 일반 SPI 옵션이나 센서 레지스터를
-              먼저 바꾸는 대신, 플래시의 지우기 단위와 지워진 상태를 확인해야 했습니다.
+              NOR flash는 erase가 끝나면 모든 bit가 <code>1</code>, 즉 <code>0xFF</code>가 됩니다.
+              새 데이터를 기록하기 전에 이전 값이 <code>0xFF</code>로 돌아가야 합니다. 이전 값이
+              남아 있으면 새 데이터를 다시 읽었을 때 원본과 달라지고, 이번처럼 read
+              buffer mismatch가 발생합니다.
             </p>
           </section>
 
           <section class="doc-section searchable-section" id="solution" data-search-title="해결 방법">
-            <h3>4. 해결 방법</h3>
+            <h3>4. 해결: flash를 직접 지운 뒤 다시 기록</h3>
             <p>
-              기존 도구의 erase 완료 메시지만으로는 충분하지 않았습니다. 실제 복구에서는
-              플래시의 erase 단위에 맞춰 지우기와 읽기 검증을 수행한 뒤, 임시 helper를
-              정상 firmware로 되돌리고 bitstream을 다시 기록했습니다.
+              기존 프로그램으로 erase를 반복하지 않고, 현재 flash 상태를 직접 처리하는
+              erase-only helper를 사용했습니다. helper는 외부 flash 전체에 bulk erase 명령
+              <code>0xC7</code>을 보낸 뒤, 문제가 난 <code>0x1000</code>을 포함한 주소를 읽어
+              모두 <code>0xFF</code>인지 확인했습니다. 이 과정으로 앞부분에 남아 있던 데이터를
+              제거했습니다.
             </p>
-            <ol class="solution-steps">
-              <li><strong>erase-only helper firmware를 올립니다.</strong> FX10이 외부 플래시 지우기와 읽기 검증만 수행하도록 합니다.</li>
-              <li><strong>플래시 ID 응답을 확인합니다.</strong> FX10과 외부 SPI 플래시 사이의 통신 경로가 정상인지 먼저 확인합니다.</li>
-              <li><strong>플래시의 erase map을 확인한 뒤 지웁니다.</strong> 이번 복구에서는 bulk erase 명령 <code>0xC7</code>으로 전체를 지운 뒤, 경계 주소에서 지워진 상태를 따로 확인했습니다.</li>
-              <li><strong>busy가 해제될 때까지 기다립니다.</strong> 이번 기록에서는 약 123.2초가 걸렸습니다.</li>
-              <li><strong>경계 주소를 읽어 지워진 값을 확인합니다.</strong> <code>0x0</code>, <code>0x1000</code>, <code>0x2000</code>, <code>0x7000</code>, <code>0x8000</code>, <code>0x10000</code>이 <code>0xFF</code>인지 확인합니다.</li>
-              <li><strong>정상 firmware를 다시 기록합니다.</strong> 지우기 전용 helper는 복구 단계가 끝난 뒤 제거합니다.</li>
-              <li><strong>정상 bitstream을 다시 기록합니다.</strong> 이후 FX Control Center에서 기록과 검증 결과를 확인합니다.</li>
-            </ol>
-
-            <figure class="doc-figure troubleshooting-figure control-center-reference-figure">
-              <div class="figure-label">FX Control Center에서 기록 결과 확인</div>
-              <img
-                src="../../assets/ez-usb-fx-control-center-reference.png"
-                alt="EZ-USB FX Control Center에서 장치와 외부 플래시 프로그램 결과가 표시된 화면"
-              />
-              <figcaption>
-                정상 firmware를 다시 올린 뒤, 이 도구에서 bitstream 기록이 끝났는지와
-                verify 결과를 확인했습니다.
-              </figcaption>
-            </figure>
-
-            <div class="warning-note" role="note">
-              <strong>주의</strong>
-              <span>
-                chip erase는 외부 SPI 플래시 전체 내용을 지웁니다. 보존해야 할 firmware나
-                설정 데이터가 있으면 먼저 백업하고, 대상 플래시가 맞는지 확인한 뒤 실행해야 합니다.
-              </span>
-            </div>
             <p>
-              장기적으로는 프로그래머가 실제 hybrid sector map을 읽고 각 구간에 맞는 erase
-              명령을 사용하도록 고치는 편이 안전합니다. 플래시를 uniform sector 구성으로
-              바꾸는 방법도 검토할 수 있지만, 정확한 부품 번호와 configuration register,
-              OTP 및 복구 가능성을 확인하기 전에는 적용하면 안 됩니다.
+              확인이 끝난 뒤에는 정상 firmware를 다시 올리고, 마지막으로 정상 bitstream을
+              기록했습니다. 이 순서로 복구한 뒤에는 같은 위치에서 기록이 멈추지 않았습니다.
             </p>
           </section>
 
@@ -280,20 +176,30 @@ Firmware download failed</code></pre>
               <div class="figure-label">지우기와 경계 주소 검증 결과</div>
               <img
                 src="../../assets/fx10-external-flash-erase-pass.png"
-                alt="외부 SPI 플래시 chip erase 후 여러 주소의 erase verify가 통과하고 ERASE_ONLY_RESULT PASS가 표시된 로그"
+                alt="외부 QSPI 플래시 chip erase 후 여러 주소의 erase verify가 통과하고 ERASE_ONLY_RESULT PASS가 표시된 로그"
               />
               <figcaption>
-                플래시를 지운 뒤 실패 지점인 <code>0x1000</code>을 포함한 경계 주소에서
-                <code>0xFF</code> 상태를 확인했습니다. 이 확인이 끝난 뒤 정상 firmware와
-                정상 bitstream을 순서대로 다시 기록했습니다.
+                실패 지점인 <code>0x1000</code>을 포함한 주소에서 <code>0xFF</code> 상태를
+                확인했습니다. 확인 뒤 정상 firmware와 정상 bitstream을 순서대로 기록했습니다.
               </figcaption>
             </figure>
 
             <p>
-              지우기 검증은 단순히 erase 명령이 반환됐는지만 보는 단계가 아닙니다. 기록에
-              실패했던 <code>0x1000</code> 주변이 실제로 지워졌는지 확인한 뒤에야 다음
-              firmware와 bitstream 기록으로 넘어갈 수 있습니다.
+              helper 로그에서 <code>0x1000</code>을 포함한 주소가 모두 통과한 것을 확인한 뒤,
+              정상 firmware와 정상 bitstream을 다시 기록했습니다. 이후 FX Control Center에서
+              firmware download와 bitstream 기록이 정상적으로 완료됐습니다.
             </p>
+
+            <figure class="doc-figure troubleshooting-figure control-center-reference-figure">
+              <div class="figure-label">FX Control Center에서 복구 후 기록 확인</div>
+              <img
+                src="../../assets/ez-usb-fx-control-center-reference.png"
+                alt="EZ-USB FX Control Center에서 장치와 외부 플래시 프로그램 결과가 표시된 화면"
+              />
+              <figcaption>
+                flash를 복구한 뒤 정상 firmware와 bitstream을 다시 기록해 완료 상태를 확인했습니다.
+              </figcaption>
+            </figure>
 
             <div class="diagnostic-table-wrap">
               <table class="diagnostic-table result-table">
@@ -318,7 +224,7 @@ Firmware download failed</code></pre>
                   <tr>
                     <td>복구 순서</td>
                     <td>erase 완료 표시 후 바로 기록</td>
-                    <td>지운 값 확인 → 정상 firmware → bitstream 재기록</td>
+                    <td><code>0xFF</code> 확인 → 정상 firmware → bitstream 재기록</td>
                   </tr>
                   <tr>
                     <td>bitstream 기록</td>
@@ -330,28 +236,12 @@ Firmware download failed</code></pre>
             </div>
           </section>
 
-          <section class="doc-section searchable-section" id="prevention" data-search-title="재발 방지">
-            <h3>6. 정리와 재발 방지</h3>
+          <section class="doc-section searchable-section" id="prevention" data-search-title="정리">
+            <h3>6. 정리</h3>
             <ul class="takeaway-list">
-              <li>erase 성공 메시지와 실제 byte가 <code>0xFF</code>인지 확인하는 작업을 구분합니다.</li>
-              <li>실패 page를 byte 주소로 계산해 4 KiB, 64 KiB 같은 경계와 일치하는지 봅니다.</li>
-              <li>flash ID가 읽혀도 sector map과 erase 명령이 올바르다는 뜻은 아닙니다.</li>
-              <li>host나 센서 설정을 바꾸기 전에 로그가 어느 하드웨어 단계에서 멈췄는지 먼저 구분합니다.</li>
-              <li>chip erase를 사용할 때는 전체 데이터 삭제 위험을 먼저 확인합니다.</li>
-            </ul>
-          </section>
-
-          <section class="doc-section reference-section" id="references">
-            <h3>참고 자료</h3>
-            <p>
-              아래 자료는 이번 로그에서 확인된 hybrid sector와 NOR erase 동작을 이해하기
-              위한 기술 참고 자료입니다. 현재 보드에 장착된 정확한 flash 부품 번호를
-              이 글에서 확정한 것은 아닙니다.
-            </p>
-            <ul>
-              <li><a href="https://www.infineon.com/dgdl/Infineon-S25FS128S_S25FS256S_1.8_V_Serial_Peripheral_Interface_with_Multi_I_O_MirrorBit%28R%29_Non-Volatile_Flash-DataSheet-v14_00-EN.PDF?fileId=8ac78c8c7d0d8da4017d0ed6b5ab5758" target="_blank" rel="noopener noreferrer">Infineon S25FS128S / S25FS256S Data Sheet ↗</a></li>
-              <li><a href="https://community.infineon.com/t5/Knowledge-Base-Articles/How-Erase-Operation-Works-in-NOR-Flash/ta-p/251756" target="_blank" rel="noopener noreferrer">How Erase Operation Works in NOR Flash ↗</a></li>
-              <li><a href="https://community.infineon.com/t5/Knowledge-Base-Articles/Hybrid-sector-architecture-of-Infineon-FL-FS-S-serial-NOR-flash-devices/ta-p/275497" target="_blank" rel="noopener noreferrer">Hybrid sector architecture of FL/FS-S serial NOR flash devices ↗</a></li>
+              <li>이번 오류는 정상 bitstream 파일의 문제가 아니라, 외부 QSPI 플래시 앞부분에 이전 데이터가 남아 발생했습니다.</li>
+              <li><code>page index 2</code>를 주소로 바꾸면 <code>0x1000</code>이었고, 이 주소가 원인을 좁히는 단서가 됐습니다.</li>
+              <li>복구할 때는 erase 완료 메시지만 보지 않고, 실제 값이 <code>0xFF</code>인지 확인한 뒤 정상 firmware와 bitstream을 기록했습니다.</li>
             </ul>
           </section>
 
@@ -361,7 +251,7 @@ Firmware download failed</code></pre>
             <span class="chapter-switcher-label">트러블슈팅 글 목록</span>
             <div>
               <a class="current" href="01-fx10-external-spi-flash.html" aria-current="page">
-                1. FX10 외부 SPI 플래시 쓰기 실패
+                1. FX10 외부 QSPI 플래시 쓰기 실패
               </a>
             </div>
           </nav>
