@@ -8,8 +8,8 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>AXI-to-APB Bridge 설계와 검증 - SoC/FPGA 학습 노트</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="../../styles.css" />
+    <script src="../../script.js" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -19,7 +19,7 @@
             <span>SoC/FPGA 학습 노트</span>
             <div class="kicker-actions"><span class="draft-label">숭실대 학부생연구인턴</span></div>
           </div>
-          <a class="home-link" href="index.html#hardware-notes">← SoC/FPGA 학습 노트로 돌아가기</a>
+          <a class="home-link" href="../../index.html#hardware-notes">← SoC/FPGA 학습 노트로 돌아가기</a>
           <nav class="chapter-switcher" aria-label="SoC bus 글 이동">
             <span class="chapter-switcher-label">SoC bus 글 목록</span>
             <div>
@@ -55,15 +55,15 @@
             </p>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AXI-to-APB bridge interface</div>
-              <img src="assets/soongsil-pdf-bridge-block-main.png" alt="AXI-to-APB bridge interface" />
+              <img src="../../assets/soongsil-pdf-bridge-block-main.png" alt="AXI-to-APB bridge interface" />
             </figure>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">Write FSM / Read FSM</div>
-              <img src="assets/soongsil-fsm-whiteboard.jpg" alt="Write FSM / Read FSM" />
+              <img src="../../assets/soongsil-fsm-whiteboard.jpg" alt="Write FSM / Read FSM" />
             </figure>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">Write FSM / Read FSM</div>
-              <img src="assets/soongsil-pdf-bridge-fsm.png" alt="Write FSM / Read FSM" />
+              <img src="../../assets/soongsil-pdf-bridge-fsm.png" alt="Write FSM / Read FSM" />
             </figure>
           </section>
 
@@ -126,7 +126,7 @@ endcase</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AXI write to APB write timing</div>
-              <img src="assets/soongsil-pdf-bridge-write-timing.png" alt="AXI write to APB write timing" />
+              <img src="../../assets/soongsil-pdf-bridge-write-timing.png" alt="AXI write to APB write timing" />
             </figure>
           </section>
 
@@ -164,7 +164,7 @@ endcase</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AXI read to APB read timing</div>
-              <img src="assets/soongsil-pdf-bridge-read-timing.png" alt="AXI read to APB read timing" />
+              <img src="../../assets/soongsil-pdf-bridge-read-timing.png" alt="AXI read to APB read timing" />
             </figure>
           </section>
 
@@ -268,12 +268,12 @@ $display("[%0t] PASS: 4REG write/read + timing OK", $time);</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AXI write 요청이 APB write transfer로 변환되는 파형</div>
-              <img src="assets/soongsil-axi-write-waveform.png" alt="AXI write channel과 APB write transfer 신호가 함께 표시된 SimVision 파형" />
+              <img src="../../assets/soongsil-axi-write-waveform.png" alt="AXI write channel과 APB write transfer 신호가 함께 표시된 SimVision 파형" />
               <figcaption>AW/W handshake 이후 APB PSEL, PENABLE, PWRITE, PADDR, PWDATA가 순서대로 생성되고, PREADY 이후 B response가 반환되는지 확인했다.</figcaption>
             </figure>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">APB read 결과가 AXI read data로 반환되는 파형</div>
-              <img src="assets/soongsil-axi-read-waveform.png" alt="AXI read channel과 APB read transfer 신호가 함께 표시된 SimVision 파형" />
+              <img src="../../assets/soongsil-axi-read-waveform.png" alt="AXI read channel과 APB read transfer 신호가 함께 표시된 SimVision 파형" />
               <figcaption>AR handshake 이후 APB read setup/enable이 생성되고, PRDATA가 AXI RDATA/RVALID/RLAST로 반환되는지 확인했다.</figcaption>
             </figure>
             <div class="rtl-card">

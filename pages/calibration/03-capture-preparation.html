@@ -11,8 +11,8 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>촬영 환경과 준비 — 캘리브레이션 설명</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="../../styles.css" />
+    <script src="../../script.js" defer></script>
   </head>
   <body>
 <div class="site-shell">
@@ -26,7 +26,7 @@
             </div>
           </div>
 
-          <a class="home-link" href="index.html">← Jay Tech Notes로 돌아가기</a>
+          <a class="home-link" href="../../index.html">← Jay Tech Notes로 돌아가기</a>
 
           <nav class="chapter-switcher" aria-label="캘리브레이션 챕터 이동">
             <span class="chapter-switcher-label">캘리브레이션 글 목록</span>
@@ -139,16 +139,17 @@
               캘리브레이션 타깃을 전체 화면으로 유지할 수 있습니다.
             </p>
 
-            <figure class="doc-figure placeholder-figure">
+            <figure class="doc-figure wide-figure">
               <div class="figure-label">전체 장비 배치 사진</div>
-              <div class="image-placeholder" role="img" aria-label="전체 장비 배치 사진 자리">
-                <span>이미지 자리</span>
-                <strong>사진: 전체 캘리브레이션 장비 배치</strong>
-                <small>NRV DVS, 고정 마운트, 제어 PC와 모니터, 별도의 blinking 패턴 모니터</small>
-              </div>
+              <img
+                src="../../assets/calibration-environment-layout.png"
+                alt="제어 모니터, blinking 패턴 모니터, 제어 PC, 고정된 스테레오 NRV DVS가 함께 배치된 캘리브레이션 촬영 환경"
+              />
               <figcaption>
-                제어 모니터와 blinking 패턴 모니터의 역할이 구분되어 보이는
-                가로형 설치 사진을 추가합니다.
+                제어 모니터와 blinking 패턴 모니터를 분리하고, 고정된
+                스테레오 NRV DVS가 캘리브레이션 타깃을 기록하는 촬영 환경입니다.
+                사진 속 연결된 카메라는 개발 중인 스테레오 버전 이벤트 카메라인
+                DELTA_Stereo입니다.
               </figcaption>
             </figure>
           </section>
@@ -249,7 +250,7 @@
             <figure class="doc-figure measurement-figure">
               <div class="figure-label">원 간격 측정 예시</div>
               <img
-                src="assets/circle-spacing-measurement-diagram.png"
+                src="../../assets/circle-spacing-measurement-diagram.png"
                 alt="바깥쪽 가장자리 거리, 안쪽 가장자리 거리, 간격 개수를 표시한 원 그리드 간격 측정 도해"
               />
               <figcaption>
@@ -284,7 +285,7 @@
             <figure class="doc-figure monitor-setup-figure">
               <div class="figure-label">패턴 모니터 설정 사진</div>
               <img
-                src="assets/pattern-monitor-setup-photo.png"
+                src="../../assets/pattern-monitor-setup-photo.png"
                 alt="전체 화면 asymmetric circle grid 캘리브레이션 패턴을 표시한 평면 모니터"
               />
               <figcaption>
@@ -332,14 +333,14 @@
               <div class="figure-grid two-up fixation-comparison">
                 <div>
                   <img
-                    src="assets/unstable-camera-surrounding-events.png"
+                    src="../../assets/unstable-camera-surrounding-events.png"
                     alt="캘리브레이션 패턴 주변으로 실내 배경 이벤트가 함께 보이는 불안정한 NRV DVS 촬영 예시"
                   />
                   <span>불안정한 촬영: 주변 장면 이벤트가 패턴과 함께 섞입니다.</span>
                 </div>
                 <div>
                   <img
-                    src="assets/stable-camera-clean-events.png"
+                    src="../../assets/stable-camera-clean-events.png"
                     alt="깜빡이는 원 그리드만 선명하게 검출된 안정적인 NRV DVS 촬영 예시"
                   />
                   <span>고정된 촬영: 원 그리드 이벤트가 깔끔하게 분리됩니다.</span>

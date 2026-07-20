@@ -8,8 +8,8 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>AHB Pipelined Bus - SoC/FPGA 학습 노트</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="../../styles.css" />
+    <script src="../../script.js" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -19,7 +19,7 @@
             <span>SoC/FPGA 학습 노트</span>
             <div class="kicker-actions"><span class="draft-label">숭실대 학부생연구인턴</span></div>
           </div>
-          <a class="home-link" href="index.html#hardware-notes">← SoC/FPGA 학습 노트로 돌아가기</a>
+          <a class="home-link" href="../../index.html#hardware-notes">← SoC/FPGA 학습 노트로 돌아가기</a>
           <nav class="chapter-switcher" aria-label="SoC bus 글 이동">
             <span class="chapter-switcher-label">SoC bus 글 목록</span>
             <div>
@@ -55,11 +55,11 @@
             </p>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">SoC bus topology</div>
-              <img src="assets/soongsil-pdf-ahb-soc-topology.png" alt="SoC bus topology" />
+              <img src="../../assets/soongsil-pdf-ahb-soc-topology.png" alt="SoC bus topology" />
             </figure>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AHB / AXI 사용 기준 필기</div>
-              <img src="assets/soongsil-lecture-ahb-vs-axi.jpg" alt="AHB와 AXI 사용 기준을 정리한 필기" />
+              <img src="../../assets/soongsil-lecture-ahb-vs-axi.jpg" alt="AHB와 AXI 사용 기준을 정리한 필기" />
             </figure>
           </section>
 
@@ -108,7 +108,7 @@
             </p>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">Lab5 AHB register block</div>
-              <img src="assets/soongsil-pdf-ahb-lab5-block.png" alt="Lab5 AHB register block" />
+              <img src="../../assets/soongsil-pdf-ahb-lab5-block.png" alt="Lab5 AHB register block" />
             </figure>
             <div class="rtl-card">
               <span>Lab5_AhbIfBlk.v - address phase latch와 register decode</span>
@@ -139,7 +139,7 @@ assign wRdSelOutC = rHSEL & valid_transfer & ~rHWRITE
             </p>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">Lab5 AHB timing</div>
-              <img src="assets/soongsil-pdf-ahb-lab5-timing.png" alt="Lab5 AHB timing" />
+              <img src="../../assets/soongsil-pdf-ahb-lab5-timing.png" alt="Lab5 AHB timing" />
             </figure>
           </section>
 
@@ -171,11 +171,11 @@ end</code></pre>
             </div>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">SP-SRAM read/write timing</div>
-              <img src="assets/soongsil-pdf-ahb-lab6-sram-local-timing.png" alt="SP-SRAM read/write timing" />
+              <img src="../../assets/soongsil-pdf-ahb-lab6-sram-local-timing.png" alt="SP-SRAM read/write timing" />
             </figure>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">AHB-to-SRAM conversion timing</div>
-              <img src="assets/soongsil-pdf-ahb-lab6-bus-conversion-timing.png" alt="AHB-to-SRAM conversion timing" />
+              <img src="../../assets/soongsil-pdf-ahb-lab6-bus-conversion-timing.png" alt="AHB-to-SRAM conversion timing" />
             </figure>
           </section>
 
@@ -187,7 +187,7 @@ end</code></pre>
             </p>
             <figure class="doc-figure wide-figure">
               <div class="figure-label">Lab5 - AHB register access waveform</div>
-              <img src="assets/soongsil-lab5-ahb-waveform.png" alt="Lab5 AHB register access SimVision 파형" />
+              <img src="../../assets/soongsil-lab5-ahb-waveform.png" alt="Lab5 AHB register access SimVision 파형" />
               <figcaption>HADDR/HWRITE가 address phase에서 잡히고, 다음 data phase에서 register write/read로 이어지는지 확인한 파형이다.</figcaption>
             </figure>
           </section>
