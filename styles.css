@@ -2386,3 +2386,325 @@ body.home-page .sitemap-number {
     grid-template-columns: 1fr;
   }
 }
+
+/* NRV FPGA troubleshooting pages are scoped so other article styles stay unchanged. */
+#nrv-fpga-troubleshooting .troubleshooting-card-grid {
+  grid-template-columns: minmax(0, 520px);
+}
+
+#nrv-fpga-troubleshooting .project-card {
+  min-height: 0;
+}
+
+body.troubleshooting-page .troubleshooting-summary {
+  display: grid;
+  margin: 1.6rem 0 1.2rem;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--nrv-red);
+  background: #fff;
+  box-shadow: var(--soft-shadow);
+}
+
+body.troubleshooting-page .summary-row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+body.troubleshooting-page .summary-row:last-child {
+  border-bottom: 0;
+}
+
+body.troubleshooting-page .summary-row strong {
+  color: var(--nrv-red-dark);
+}
+
+body.troubleshooting-page .summary-row span {
+  color: var(--soft-ink);
+  line-height: 1.6;
+}
+
+body.troubleshooting-page .jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 1.2rem 0 2.2rem;
+}
+
+body.troubleshooting-page .jump-links a {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+body.troubleshooting-page .jump-links a:hover {
+  border-color: var(--nrv-red);
+  color: var(--nrv-red-dark);
+}
+
+body.troubleshooting-page .debug-flow {
+  display: grid;
+  grid-template-columns: repeat(7, auto);
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin: 1.5rem 0 2rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+body.troubleshooting-page .debug-flow div {
+  display: grid;
+  min-width: 145px;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+body.troubleshooting-page .debug-flow div > span {
+  color: var(--nrv-red);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+body.troubleshooting-page .debug-flow strong {
+  margin: 0.25rem 0;
+  color: var(--ink);
+}
+
+body.troubleshooting-page .debug-flow small {
+  color: var(--muted);
+}
+
+body.troubleshooting-page .debug-flow > b {
+  color: var(--nrv-red);
+}
+
+body.troubleshooting-page .troubleshooting-figure {
+  max-width: 920px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+body.troubleshooting-page .troubleshooting-figure img {
+  width: 100%;
+  max-height: 620px;
+  object-fit: contain;
+  background: #f4f5f7;
+}
+
+body.troubleshooting-page .hardware-reference-figure {
+  max-width: 720px;
+}
+
+body.troubleshooting-page .control-center-reference-figure {
+  max-width: 820px;
+}
+
+body.troubleshooting-page .terminal-figure img {
+  max-height: 760px;
+  background: #000;
+}
+
+body.troubleshooting-page .log-block {
+  overflow-x: auto;
+  margin: 1.3rem 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid #262b35;
+  border-left: 5px solid var(--nrv-red);
+  background: #10131a;
+  color: #e8edf5;
+  font: 0.88rem/1.65 "Cascadia Mono", Consolas, monospace;
+}
+
+body.troubleshooting-page .address-math {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem 1.2rem;
+  margin: 1.2rem 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--nrv-red);
+  background: var(--panel);
+}
+
+body.troubleshooting-page .address-math span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.troubleshooting-page .address-math strong {
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+body.troubleshooting-page .diagnostic-table-wrap {
+  overflow-x: auto;
+  margin: 1.3rem 0 2rem;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+body.troubleshooting-page .diagnostic-table {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+body.troubleshooting-page .diagnostic-table th,
+body.troubleshooting-page .diagnostic-table td {
+  padding: 0.78rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+body.troubleshooting-page .diagnostic-table th {
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+body.troubleshooting-page .diagnostic-table tr:last-child td {
+  border-bottom: 0;
+}
+
+body.troubleshooting-page .status-chip {
+  display: inline-flex;
+  padding: 0.25rem 0.48rem;
+  border: 1px solid #b9c8bd;
+  background: #eff8f1;
+  color: #256139;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+body.troubleshooting-page .status-chip.focus {
+  border-color: rgb(213 15 52 / 28%);
+  background: rgb(213 15 52 / 6%);
+  color: var(--nrv-red-dark);
+}
+
+body.troubleshooting-page .root-cause-card {
+  margin: 1.4rem 0 1.6rem;
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--nrv-red);
+  background: #fff;
+  box-shadow: var(--soft-shadow);
+}
+
+body.troubleshooting-page .root-cause-card > span {
+  color: var(--nrv-red);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body.troubleshooting-page .root-cause-card h4 {
+  margin: 0.45rem 0 0.7rem;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+body.troubleshooting-page .root-cause-card p {
+  margin: 0;
+}
+
+body.troubleshooting-page .solution-steps {
+  display: grid;
+  gap: 0.7rem;
+  margin: 1.3rem 0 1.6rem;
+  padding: 0;
+  counter-reset: solution;
+}
+
+body.troubleshooting-page .solution-steps li {
+  position: relative;
+  list-style: none;
+  padding: 0.9rem 1rem 0.9rem 3.2rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  line-height: 1.65;
+}
+
+body.troubleshooting-page .solution-steps li::before {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.95rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: var(--nrv-red);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.55rem;
+  text-align: center;
+  counter-increment: solution;
+  content: counter(solution);
+}
+
+body.troubleshooting-page .warning-note {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid #e7c68d;
+  border-left: 5px solid #c68418;
+  background: #fffaf0;
+}
+
+body.troubleshooting-page .warning-note strong {
+  color: #8b590a;
+}
+
+body.troubleshooting-page .warning-note span {
+  line-height: 1.65;
+}
+
+body.troubleshooting-page .takeaway-list {
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.25rem;
+}
+
+body.troubleshooting-page .reference-section a {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  body.troubleshooting-page .debug-flow {
+    grid-template-columns: 1fr;
+  }
+
+  body.troubleshooting-page .debug-flow > b {
+    transform: rotate(90deg);
+    text-align: center;
+  }
+}
+
+@media (max-width: 680px) {
+  #nrv-fpga-troubleshooting .troubleshooting-card-grid,
+  body.troubleshooting-page .summary-row,
+  body.troubleshooting-page .warning-note {
+    grid-template-columns: 1fr;
+  }
+}

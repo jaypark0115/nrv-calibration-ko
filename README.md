@@ -1,7 +1,7 @@
 # Jay Tech Notes
 
 제가 직접 작성하고 정리한 기술 글, 실험 기록, 논문 자료를 모아두는 개인 기술 노트입니다.
-현재 공개 페이지는 메인 화면에 보이는 순서와 동일하게 `SNN 연구 노트`, `NRV DVS 캘리브레이션 설명`, `GitHub 프로젝트 링크`, `SoC/FPGA 학습 노트` 순서로 구성되어 있습니다.
+현재 공개 페이지는 메인 화면에 보이는 순서와 동일하게 `SNN 연구 노트`, `NRV DVS 캘리브레이션 설명`, `NRV FPGA 트러블슈팅 노트`, `GitHub 프로젝트 링크`, `SoC/FPGA 학습 노트` 순서로 구성되어 있습니다.
 
 이 저장소의 첫 화면은 개인적으로 정리한 글 목록이며, NRV 공식 문서가 아닙니다.
 NRV와 관련된 공식 정보는 NRV docs 웹페이지에서 확인해야 합니다.
@@ -34,7 +34,12 @@ https://jaypark0115.github.io/jay-tech-notes/
 3. [촬영 환경과 준비](https://jaypark0115.github.io/jay-tech-notes/pages/calibration/03-capture-preparation.html)
    - 캘리브레이션 데이터를 얻기 전 필요한 장비, 모니터 설정, 원 간격 측정, 카메라 고정 조건을 정리했습니다.
 
-### 3. GitHub 프로젝트 링크
+### 3. NRV FPGA 트러블슈팅 노트
+
+1. [FX10 외부 SPI 플래시 쓰기 실패](https://jaypark0115.github.io/jay-tech-notes/pages/troubleshooting/01-fx10-external-spi-flash.html)
+   - page index 2의 readback mismatch를 외부 SPI NOR의 sector map과 erase 단위 문제로 좁히고 해결한 과정을 정리했습니다.
+
+### 4. GitHub 프로젝트 링크
 
 1. [blinking-circle-grid-for-dvs-calibration](https://github.com/jaypark0115/blinking-circle-grid-for-dvs-calibration)
    - NRV DVS 캘리브레이션에 사용할 blinking asymmetric circle grid 패턴을 모니터에 표시하기 위한 프로젝트입니다.
@@ -43,7 +48,7 @@ https://jaypark0115.github.io/jay-tech-notes/
 3. [stereo-fpga-camera-bracket](https://github.com/jaypark0115/stereo-fpga-camera-bracket)
    - 스테레오 이벤트 카메라 모듈과 FPGA 보드를 고정하고 기준 거리 조절을 위해 설계·출력한 3D 프린팅 브라켓 기록입니다.
 
-### 4. SoC/FPGA 학습 노트
+### 5. SoC/FPGA 학습 노트
 
 1. [APB Control Bus](https://jaypark0115.github.io/jay-tech-notes/pages/soc/04-apb-bus.html)
    - APB setup/enable phase와 Lab2~4의 register, SRAM, interrupt 실습을 설명합니다.
